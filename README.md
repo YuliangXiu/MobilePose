@@ -10,7 +10,7 @@ Note: This is a pretty coarse implementation of original paper, so it's far from
 ## Todo List:
 - [x] accuracy(mAP) evaluation script
 - [ ] multi-scales training and testing
-- [ ] data augmentation(rotate/shift/flip)
+- [x] data augmentation(rotate/shift/flip)
 - [ ] support LSP COCO AIC dataset
 - [ ] Teacher-Student Learning(For 4 times compression)
 

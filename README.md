@@ -8,7 +8,7 @@ Note: This is a pretty coarse implementation of original paper, so it's far from
 - Pytorch 0.2.0\_3 
 
 ## Todo List:
-- [ ] accuracy(mAP) evaluation script
+- [x] accuracy(mAP) evaluation script
 - [ ] multi-scales training and testing
 - [ ] data augmentation(rotate/shift/flip)
 - [ ] support LSP COCO AIC dataset

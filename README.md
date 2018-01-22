@@ -13,4 +13,4 @@ Note: This is a pretty coarse implementation of original paper, so it's far from
 - [x] data augmentation(rotate/shift/flip)
 - [ ] support LSP COCO AIC dataset
 - [ ] Teacher-Student Learning(For 4 times compression)
-- [ ] support Macbook camera realtime skeleton display demo
+- [x] support Macbook camera realtime skeleton display demo

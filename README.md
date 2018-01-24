@@ -9,8 +9,9 @@ Note: This is a pretty coarse implementation of original paper, so it's far from
 
 ## Todo List:
 - [x] accuracy(mAP) evaluation script
-- [ ] multi-scales training and testing (Training...)
-- [x] data augmentation(rotate/shift/flip)
-- [ ] support LSP COCO AIC dataset
-- [ ] Teacher-Student Learning(For 4 times compression)
+- [ ] multi-scales training
+- [x] data augmentation(rotate/shift/flip/multi-scale)
+- [ ] support LSP dataset
+- [ ] normalization(/256 mean std)
+- [ ] Teacher-Student Learning( around 4 times compression )
 - [x] support Macbook camera realtime skeleton display demo

@@ -13,5 +13,6 @@ Note: This is a pretty coarse implementation of original paper, so it's far from
 - [x] data augmentation(rotate/shift/flip/multi-scale)
 - [ ] support LSP dataset
 - [ ] normalization(/256 mean std)
+- [ ] adding weighted loss(coco keypoints weight)
 - [ ] Teacher-Student Learning( around 4 times compression )
 - [x] support Macbook camera realtime skeleton display demo

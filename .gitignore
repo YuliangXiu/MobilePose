@@ -1,3 +1,5 @@
+*.t7
 *.jpg
 /images
+/models
 /image

@@ -1,5 +1,6 @@
 *.t7
 *.jpg
+*.txt
 /images
 /models
 /image

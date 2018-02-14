@@ -4,4 +4,4 @@
 *.jpg
 *.txt
 models
-
+.ipynb_checkpoints

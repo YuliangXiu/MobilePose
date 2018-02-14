@@ -1,7 +1,9 @@
-.ipynb_checkpoints
+.ipynb_checkpoints/
 *.t7
 *.jpg
 *.txt
 /images
 /models
 /image
+models/
+

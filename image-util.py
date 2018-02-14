@@ -1,3 +1,5 @@
+
+
 def expand_bbox(left, right, top, bottom, img_width, img_height):
     width = right-left
     height = bottom-top
@@ -8,7 +10,9 @@ def expand_bbox(left, right, top, bottom, img_width, img_height):
     new_bottom = np.clip(bottom+ratio*height,0,img_height)
     return [int(new_left), int(new_top), int(new_right), int(new_bottom)]
 
+
 def display_pose(img, pose):
+
     pose  = pose.data.cpu().numpy().reshape([-1,2])
     img = img.cpu().numpy().transpose(1,2,0)
     img_width, img_height,_ = img.shape

@@ -31,7 +31,7 @@ class Rescale(object):
         right_pad = (self.output_size[1] - new_w) - left_pad
         top_pad = (self.output_size[0] - new_h) // 2
         bottom_pad = (self.output_size[0] - new_h) - top_pad
-        mean=np.array([0.485, 0.456, 0.406]) * 256
+        mean=np.array([0.485, 0.456, 0.406])
         pad = ((top_pad, bottom_pad), (left_pad, right_pad))
         image = np.stack([np.pad(image[:,:,c], pad, mode='constant', constant_values=mean[c]) 
                         for c in range(3)], axis=2)
@@ -64,7 +64,7 @@ class ToTensor(object):
         # swap color axis because
         # numpy image: H x W x C
         # torch image: C X H X W
-        mean=np.array([0.485, 0.456, 0.406])
+        mean=np.array([0.485, 0.456, 0.406]) 
         std=np.array([0.229, 0.224, 0.225])
         image = (image[:,:,:3]-mean)/std
         image = torch.from_numpy(image.transpose((2, 0, 1))).float()
@@ -84,7 +84,7 @@ class PoseDataset(Dataset):
     def __len__(self):
         return len(self.f_csv)
         
-    def expand_bbox(left, right, top, bottom, img_width, img_height):
+    def expand_bbox(self, left, right, top, bottom, img_width, img_height):
         width = right-left
         height = bottom-top
         ratio = 0.15

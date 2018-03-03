@@ -47,30 +47,57 @@ def expand_bbox(left, right, top, bottom, img_width, img_height):
     return [int(new_left), int(new_top), int(new_right), int(new_bottom)]
 
     
-class Rescale(object):
+# class Rescale(object):
 
+#     def __init__(self, output_size):
+#         assert isinstance(output_size, (int, tuple))
+#         self.output_size = output_size
+
+#     def __call__(self, sample):
+#         image_, pose_ = sample['image'], sample['pose']
+
+#         h, w = image_.shape[:2]
+#         if isinstance(self.output_size, int):
+#             if h > w:
+#                 new_h, new_w = self.output_size * h / w, self.output_size
+#             else:
+#                 new_h, new_w = self.output_size, self.output_size * w / h
+#         else:
+#             new_h, new_w = self.output_size
+
+#         new_h, new_w = int(new_h), int(new_w)
+
+#         image = transform.resize(image_, (new_h, new_w))
+#         pose = (pose_.reshape([-1,2])/np.array([w,h])*np.array([new_w,new_h])).flatten()
+#         return {'image': image, 'pose': pose}
+
+class Rescale(object):
+    
     def __init__(self, output_size):
         assert isinstance(output_size, (int, tuple))
         self.output_size = output_size
 
     def __call__(self, sample):
         image_, pose_ = sample['image'], sample['pose']
-
         h, w = image_.shape[:2]
-        if isinstance(self.output_size, int):
-            if h > w:
-                new_h, new_w = self.output_size * h / w, self.output_size
-            else:
-                new_h, new_w = self.output_size, self.output_size * w / h
-        else:
-            new_h, new_w = self.output_size
-
-        new_h, new_w = int(new_h), int(new_w)
-
-        image = transform.resize(image_, (new_h, new_w))
-        pose = (pose_.reshape([-1,2])/np.array([w,h])*np.array([new_w,new_h])).flatten()
+        im_scale = min(float(self.output_size[0]) / float(h), float(self.output_size[1]) / float(w))
+        new_h = int(image_.shape[0] * im_scale)
+        new_w = int(image_.shape[1] * im_scale)
+        image = cv2.resize(image_, (new_w, new_h),
+                    interpolation=cv2.INTER_LINEAR)
+        left_pad = (self.output_size[1] - new_w) // 2
+        right_pad = (self.output_size[1] - new_w) - left_pad
+        top_pad = (self.output_size[0] - new_h) // 2
+        bottom_pad = (self.output_size[0] - new_h) - top_pad
+        mean=np.array([0.485, 0.456, 0.406])
+        pad = ((top_pad, bottom_pad), (left_pad, right_pad))
+        image = np.stack([np.pad(image[:,:,c], pad, mode='constant', constant_values=mean[c]) 
+                        for c in range(3)], axis=2)
+        pose = (pose_.reshape([-1,2])/np.array([w,h])*np.array([new_w,new_h]))
+        pose += [left_pad, top_pad]
+        pose = pose.flatten()
         return {'image': image, 'pose': pose}
-
+        
 class ToTensor(object):
 
     def __call__(self, sample):
@@ -122,16 +149,13 @@ class PoseDataset(Dataset):
         return sample
 
 ROOT_DIR = "/home/yuliang/code/deeppose_tf/datasets/mpii"
-BATCH_SIZE = 24
+BATCH_SIZE = 128
 input_image_size = 224
-# input_image_size = 227
 train_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'train_joints.csv'),
                                   transform=transforms.Compose([
                                                Rescale((input_image_size,input_image_size)),
                                                ToTensor()
                                            ]))
-# train_dataloader = DataLoader(train_dataset, batch_size=256,
-#                         shuffle=False, num_workers = 10)
 
 train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE,
                         shuffle=False, num_workers = 10)

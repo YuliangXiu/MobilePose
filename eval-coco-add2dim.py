@@ -8,109 +8,16 @@ import numpy as np
 import torch
 import csv
 import os
+from dataloader import *
+from utils import *
 
 os.environ["CUDA_VISIBLE_DEVICES"]="1"
-torch.cuda.set_device(0) 
+# torch.cuda.set_device(0) 
 torch.backends.cudnn.enabled = True
 print(torch.cuda.device_count())
 gpus = [0,1]
 
 ROOT_DIR = "/home/yuliang/code/deeppose_tf/datasets/mpii"
-
-def expand_bbox(left, right, top, bottom, img_width, img_height):
-    width = right-left
-    height = bottom-top
-    ratio = 0.15
-    new_left = np.clip(left-ratio*width,0,img_width)
-    new_right = np.clip(right+ratio*width,0,img_width)
-    new_top = np.clip(top-ratio*height,0,img_height)
-    new_bottom = np.clip(bottom+ratio*height,0,img_height)
-    return [int(new_left), int(new_top), int(new_right), int(new_bottom)]
-
-class Rescale(object):
-    def __init__(self, output_size):
-        assert isinstance(output_size, (int, tuple))
-        self.output_size = output_size
-
-    def __call__(self, sample):
-        image_, pose_ = sample['image'], sample['pose']
-
-        h, w = image_.shape[:2]
-        if isinstance(self.output_size, int):
-            if h > w:
-                new_h, new_w = self.output_size * h / w, self.output_size
-            else:
-                new_h, new_w = self.output_size, self.output_size * w / h
-        else:
-            new_h, new_w = self.output_size
-
-        new_h, new_w = int(new_h), int(new_w)
-
-        image = transform.resize(image_, (new_h, new_w))
-        pose = (pose_.reshape([-1,2])/np.array([w,h])*np.array([new_w,new_h])).flatten()
-        return {'image': image, 'pose': pose}
-
-class Expansion(object): 
-    def __call__(self, sample):
-        image, pose = sample['image'], sample['pose']
-        h, w = image.shape[:2]
-        x = np.arange(0, h)
-        y = np.arange(0, w) 
-        x, y = np.meshgrid(x, y)
-        x = x[:,:, np.newaxis]
-        y = y[:,:, np.newaxis]
-        image = np.concatenate((image, x), axis=2)
-        image = np.concatenate((image, y), axis=2)
-        
-        return {'image': image,
-                'pose': pose}
-    
-class ToTensor(object):
-    def __call__(self, sample):
-        image, pose = sample['image'], sample['pose']
- 
-        # swap color axis because
-        # numpy image: H x W x C
-        # torch image: C X H X W
-        mean=np.array([0.485, 0.456, 0.406])
-        std=np.array([0.229, 0.224, 0.225])
-        image = (image[:,:,:3]-mean)/std
-        image = torch.from_numpy(image.transpose((2, 0, 1))).float()
-        pose = torch.from_numpy(pose).float()
-        
-        return {'image': image,
-                'pose': pose}
-    
-class PoseDataset(Dataset):
-    def __init__(self, csv_file, transform):
-        
-        with open(csv_file) as f:
-            self.f_csv = list(csv.reader(f, delimiter='\t'))
-        self.transform = transform
-
-    def __len__(self):
-        return len(self.f_csv)
-
-    def __getitem__(self, idx):
-        line = self.f_csv[idx][0].split(",")
-        img_path = os.path.join(ROOT_DIR,'images',line[0])
-        image = io.imread(img_path)
-        height, width = image.shape[0], image.shape[1]
-        pose = np.array([float(item) for item in line[1:]]).reshape([-1,2])
-        
-        xmin = np.min(pose[:,0])
-        ymin = np.min(pose[:,1])
-        xmax = np.max(pose[:,0])
-        ymax = np.max(pose[:,1])
-        
-        box = expand_bbox(xmin, xmax, ymin, ymax, width, height)
-        image = image[box[1]:box[3],box[0]:box[2],:]
-        pose = (pose-np.array([box[0],box[1]])).flatten()
-        
-        sample = {'image': image, 'pose':pose}
-        if self.transform:
-            sample = self.transform(sample)
-        return sample
 
 ###############################COCO CLASS###############################
 # define coco class
@@ -310,7 +217,7 @@ def eval_coco(net_path, result_gt_json_path, result_pred_json_path):
     ##### generate result ground truth json #####
     total_size = len(all_test_data['image'])
     all_coco_pred_annotations_arr = [] 
-    for i in range(1, ceil(total_size / 100.0) + 1):
+    for i in range(1, int(ceil(total_size / 100.0) + 1)):
         sample_data = {}
         print(100 * (i - 1), min(100 * i, total_size))
         sample_data['image'] = all_test_data['image'][100 * (i - 1) : min(100 * i, total_size)].cuda(device=gpus[0])
@@ -331,9 +238,9 @@ PATH_PREFIX = "./cocoapi/PythonAPI/txts"
 if not os.path.exists(PATH_PREFIX):
     os.makedirs(PATH_PREFIX)
 # model dir
-mdir="/home/yuliang/code/DeepPose-pytorch/models/czx"
+mdir="/home/yuliang/code/DeepPose-pytorch/models/yh"
 # model name
-name = "czx"
+name = "yh"
 # final epoch
 epoch = 20
 

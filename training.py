@@ -9,27 +9,23 @@ import torch.backends.cudnn as cudnn
 from torch.utils.data import Dataset, DataLoader
 from torchvision import datasets, transforms, utils, models
 from torch.autograd import Variable
-
 import os
 from skimage import io, transform
 import numpy as np
 import csv
-# import matplotlib.pyplot as plt
 from tqdm import tqdm
 import warnings
 warnings.filterwarnings('ignore')
 
 from dataloader import *
 from utils import *
-from mobilenetv2 import *
 
-
-os.environ["CUDA_VISIBLE_DEVICES"]="0"
-# torch.cuda.set_device(1) 
+os.environ["CUDA_VISIBLE_DEVICES"]="1"
 torch.backends.cudnn.enabled = True
 print("GPU : %d"%(torch.cuda.device_count()))
 
 ROOT_DIR = "/home/yuliang/code/deeppose_tf/datasets/mpii"
+PATH_PREFIX = '/home/yuliang/code/DeepPose-pytorch/models/yh/'
 
 train_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'train_joints.csv'),
                                   transform=transforms.Compose([
@@ -38,7 +34,7 @@ train_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'train_joints.csv'),
                                                ToTensor()
                                            ]))
 train_dataloader = DataLoader(train_dataset, batch_size=256,
-                        shuffle=False, num_workers = 10)
+                        shuffle=False, num_workers = 20)
 
 test_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'test_joints.csv'),
                                   transform=transforms.Compose([
@@ -47,7 +43,7 @@ test_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'test_joints.csv'),
                                                ToTensor()
                                            ]))
 test_dataloader = DataLoader(test_dataset, batch_size=256,
-                        shuffle=False, num_workers = 10)
+                        shuffle=False, num_workers = 20)
 
 class Net(nn.Module):
 
@@ -65,12 +61,12 @@ class Net(nn.Module):
         return pose_out
 
 
-# net = Net()
+net = Net()
 gpus = [0,1]
-net = torch.load('models/yh/checkpoint30.t7').cuda(device_id=gpus[0])
+# net = torch.load('models/yh/checkpoint30.t7').cuda(device_id=gpus[0])
 criterion = nn.MSELoss().cuda()
-optimizer = optim.SGD(filter(lambda p: p.requires_grad, net.parameters()), lr=0.0005, momentum=0.9)
-# optimizer = optim.SGD(net.parameters(), lr=0.0005, momentum=0.9)
+# optimizer = optim.SGD(filter(lambda p: p.requires_grad, net.parameters()), lr=0.0005, momentum=0.9)
+optimizer = optim.SGD(net.parameters(), lr=0.0005, momentum=0.9)
 
 
 def mse_loss(input, target):
@@ -94,7 +90,6 @@ for epoch in tqdm(range(1000)):  # loop over the dataset multiple times
         train_loss_epoch.append(loss.data[0])
 
     if epoch%10==0:
-        PATH_PREFIX = '/home/yuliang/code/DeepPose-pytorch/models/yh/'
         checkpoint_file = PATH_PREFIX + 'checkpoint{}.t7'.format(epoch)
         torch.save(net, checkpoint_file)
         print('==> checkpoint model saving to %s'%checkpoint_file)

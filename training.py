@@ -24,8 +24,9 @@ os.environ["CUDA_VISIBLE_DEVICES"]="1"
 torch.backends.cudnn.enabled = True
 print("GPU : %d"%(torch.cuda.device_count()))
 
+name = "yh"
 ROOT_DIR = "/home/yuliang/code/deeppose_tf/datasets/mpii"
-PATH_PREFIX = '/home/yuliang/code/DeepPose-pytorch/models/yh/'
+PATH_PREFIX = '/home/yuliang/code/DeepPose-pytorch/models/{}/'.format(name)
 
 train_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'train_joints.csv'),
                                   transform=transforms.Compose([
@@ -59,7 +60,6 @@ class Net(nn.Module):
        
         pose_out = self.resnet(x)
         return pose_out
-
 
 net = Net()
 gpus = [0,1]
@@ -103,7 +103,7 @@ for epoch in tqdm(range(1000)):  # loop over the dataset multiple times
             valid_loss_epoch.append(mse_loss(outputs.data,poses))
         print('[epoch %d] train loss: %.8f, valid loss: %.8f' %
           (epoch + 1, np.mean(np.array(train_loss_epoch)), np.mean(np.array(valid_loss_epoch))))
-        with open(PATH_PREFIX+"log", 'a+') as file_output:
+        with open(PATH_PREFIX+"log.txt", 'a+') as file_output:
             file_output.write('[epoch %d] train loss: %.8f, valid loss: %.8f\n' %
               (epoch + 1, np.mean(np.array(train_loss_epoch)), np.mean(np.array(valid_loss_epoch))))
             file_output.flush() 

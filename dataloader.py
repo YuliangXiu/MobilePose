@@ -64,7 +64,7 @@ class ToTensor(object):
         # swap color axis because
         # numpy image: H x W x C
         # torch image: C X H X W
-        mean=np.array([0.485, 0.456, 0.406]) 
+        mean=np.array([0.485, 0.456, 0.406])
         std=np.array([0.229, 0.224, 0.225])
         image = (image[:,:,:3]-mean)/std
         image = torch.from_numpy(image.transpose((2, 0, 1))).float()
@@ -87,7 +87,7 @@ class PoseDataset(Dataset):
     def expand_bbox(self, left, right, top, bottom, img_width, img_height):
         width = right-left
         height = bottom-top
-        ratio = 0.15
+        ratio = 0.2
         new_left = np.clip(left-ratio*width,0,img_width)
         new_right = np.clip(right+ratio*width,0,img_width)
         new_top = np.clip(top-ratio*height,0,img_height)
@@ -98,7 +98,7 @@ class PoseDataset(Dataset):
         ROOT_DIR = "/home/yuliang/code/deeppose_tf/datasets/mpii"
         line = self.f_csv[idx][0].split(",")
         img_path = os.path.join(ROOT_DIR,'images',line[0])
-        image = io.imread(img_path)
+        image = io.imread(img_path)/256.0
         height, width = image.shape[0], image.shape[1]
         pose = np.array([float(item) for item in line[1:]]).reshape([-1,2])
         
@@ -106,11 +106,9 @@ class PoseDataset(Dataset):
         ymin = np.min(pose[:,1])
         xmax = np.max(pose[:,0])
         ymax = np.max(pose[:,1])
-        
         box = expand_bbox(xmin, xmax, ymin, ymax, width, height)
         image = image[box[1]:box[3],box[0]:box[2],:]
         pose = (pose-np.array([box[0],box[1]])).flatten()
-        
         sample = {'image': image, 'pose':pose}
         if self.transform:
             sample = self.transform(sample)

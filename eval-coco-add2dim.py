@@ -1,12 +1,8 @@
-
 # coding: utf-8
-
-# In[1]:
-
 
 from torch.utils.data import Dataset, DataLoader
 from torchvision import datasets, transforms, utils, models
-from tqdm import tqdm_notebook
+from tqdm import tqdm
 from skimage import io, transform
 import numpy as np
 import torch
@@ -270,9 +266,6 @@ class Net(nn.Module):
         return pose_out
 
 
-# In[6]:
-
-
 from math import ceil
 
 print("Loading testing dataset, wait...")
@@ -288,7 +281,7 @@ test_dataloader = DataLoader(test_dataset, batch_size=test_dataset_size,
                         shuffle=False, num_workers = 10)
 # get all test data
 all_test_data = {}
-for i_batch, sample_batched in enumerate(tqdm_notebook(test_dataloader)):
+for i_batch, sample_batched in enumerate(tqdm(test_dataloader)):
     all_test_data = sample_batched
     
 def eval_coco(net_path, result_gt_json_path, result_pred_json_path):
@@ -333,17 +326,52 @@ def eval_coco(net_path, result_gt_json_path, result_pred_json_path):
     f.close()
 
 
-# In[7]:
-
-
-#eval_coco(net_path, result_gt_json_path, result_pred_json_path)
-PATH_PREFIX = "./cocoapi/PythonAPI/txts/add2dim"
+# eval_coco(net_path, result_gt_json_path, result_pred_json_path)
+PATH_PREFIX = "./cocoapi/PythonAPI/txts"
 if not os.path.exists(PATH_PREFIX):
     os.makedirs(PATH_PREFIX)
-mdir="/disk3/yinghong/data/mobile-model"
-for i in range(0,300, 10):
-    filename = "add2dim-checkpoint{}.t7".format(i)
+# model dir
+mdir="/home/yuliang/code/DeepPose-pytorch/models/czx"
+# model name
+name = "czx"
+# final epoch
+epoch = 20
+
+for i in range(0,epoch,10):
+    filename = "checkpoint{}.t7".format(i)
     full_name = os.path.join(mdir, filename)
-    eval_coco(full_name,     os.path.join(PATH_PREFIX, 'result-gt-add2dim-{}-json.txt'.format(i)), 
-    os.path.join(PATH_PREFIX, 'result-pred-add2dim-{}-json.txt'.format(i)))
+    eval_coco(full_name, os.path.join(PATH_PREFIX, 'result-gt-{}-{}-json.txt'.format(name,i)),\
+    os.path.join(PATH_PREFIX, 'result-pred-{}-{}-json.txt'.format(name,i)))
+
+# evaluation
+os.chdir("/home/yuliang/code/DeepPose-pytorch/cocoapi/PythonAPI")
+from pycocotools.coco import COCO
+from pycocotools.cocoeval import COCOeval
+import numpy as np
+import skimage.io as io
+import json
+import os
+
+annType = ['segm','bbox','keypoints']
+annType = annType[2]      #specify type here
+prefix = 'person_keypoints' if annType=='keypoints' else 'instances'
+print 'Running demo for *%s* results.'%(annType)
+
+PATH_PREFIX = "./txts"
+
+for i in range(0,epoch,10):
+
+    annFile = os.path.join(PATH_PREFIX, "result-gt-{}-{}-json.txt".format(name,i))
+    cocoGt=COCO(annFile)
+
+    resFile = os.path.join(PATH_PREFIX, "result-pred-{}-{}-json.txt".format(name,i))
+
+    cocoDt=cocoGt.loadRes(resFile)
+    imgIds=sorted(cocoGt.getImgIds())
+
+    cocoEval = COCOeval(cocoGt,cocoDt,annType)
+    cocoEval.params.imgIds = imgIds
+    cocoEval.evaluate()
+    cocoEval.accumulate()
+    cocoEval.summarize()
 

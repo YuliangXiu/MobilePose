@@ -65,10 +65,11 @@ class Net(nn.Module):
         return pose_out
 
 
-# net = torch.load('checkpoint20.t7').cuda(device_id=gpus[1])
-net = Net()
+# net = Net()
+gpus = [0,1]
+net = torch.load('models/yh/checkpoint30.t7').cuda(device_id=gpus[0])
 criterion = nn.MSELoss().cuda()
-optimizer = optim.SGD(filter(lambda p: p.requires_grad, net.parameters()), lr=0.001, momentum=0.9)
+optimizer = optim.SGD(filter(lambda p: p.requires_grad, net.parameters()), lr=0.0005, momentum=0.9)
 # optimizer = optim.SGD(net.parameters(), lr=0.0005, momentum=0.9)
 
 

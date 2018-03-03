@@ -1,7 +1,11 @@
 # DeepPose-pytorch
 Reproduce Google's [DeepPose](https://arxiv.org/pdf/1312.4659.pdf) with Resnet18 by Pytorch
 
-Note: This is a pretty coarse implementation of original paper, so it's far from Google's results.
+## Functionality
+
+1. **Tiny** trained model (<10MB)
+2. **Fast** inference speed (>30FPS)
+3. **Accurate** keypoint estimation (~40mAP)
 
 ## Requirements:
 - Python 3.6.2

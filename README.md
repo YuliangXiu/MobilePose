@@ -14,7 +14,7 @@ Reproduce Google's [DeepPose](https://arxiv.org/pdf/1312.4659.pdf) with Resnet18
 ## Todo List:
 - [x] accuracy(mAP) evaluation script
 - [x] multi-scales training
-- [ ] data augmentation(rotate/shift/flip/multi-scale)
+- [x] data augmentation(rotate/shift/flip/multi-scale)
 - [x] support LSP dataset
 - [x] normalization(/256 mean std)
 - [x] adding weighted loss(coco keypoints weight) 

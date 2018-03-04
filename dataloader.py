@@ -21,6 +21,7 @@ def expand_bbox(left, right, top, bottom, img_width, img_height):
     new_right = np.clip(right+ratio*width,0,img_width)
     new_top = np.clip(top-ratio*height,0,img_height)
     new_bottom = np.clip(bottom+ratio*height,0,img_height)
+    
     return [int(new_left), int(new_top), int(new_right), int(new_bottom)]
 
 class Rescale(object):
@@ -48,6 +49,7 @@ class Rescale(object):
         pose = (pose_.reshape([-1,2])/np.array([w,h])*np.array([new_w,new_h]))
         pose += [left_pad, top_pad]
         pose = pose.flatten()
+
         return {'image': image, 'pose': pose}
 
 class Expansion(object):
@@ -110,6 +112,7 @@ class PoseDataset(Dataset):
         if self.transform:
             sample = self.transform(sample)
         return sample
+
 
 import imgaug as ia
 from imgaug import augmenters as iaa

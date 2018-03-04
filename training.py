@@ -63,12 +63,12 @@ class Net(nn.Module):
         pose_out = self.resnet(x)
         return pose_out
 
-net = Net()
+net = Net().cuda()
 gpus = [0,1]
 # net = torch.load('models/yh/final.t7').cuda(device_id=gpus[0])
 criterion = nn.MSELoss().cuda()
 # optimizer = optim.SGD(filter(lambda p: p.requires_grad, net.parameters()), lr=0.0005, momentum=0.9)
-optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+optimizer = optim.SGD(filter(lambda p: p.requires_grad, net.parameters()), lr=0.001, momentum=0.9)
 
 
 def mse_loss(input, target):
@@ -93,11 +93,11 @@ for epoch in tqdm(range(1000)):  # loop over the dataset multiple times
 
         train_loss_epoch.append(loss.data[0])
 
-    if epoch%2==0:
+    if epoch%20==0:
         valid_loss_epoch = []
         for i_batch, sample_batched in enumerate(test_dataloader):
 
-            net_forward = net.cuda()
+            net_forward = net
             images = sample_batched['image'].cuda()
             poses = sample_batched['pose'].cuda()
             outputs = net_forward(Variable(images, volatile=True))

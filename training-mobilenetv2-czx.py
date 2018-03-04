@@ -46,30 +46,6 @@ def expand_bbox(left, right, top, bottom, img_width, img_height):
     new_bottom = np.clip(bottom+ratio*height,0,img_height)
     return [int(new_left), int(new_top), int(new_right), int(new_bottom)]
 
-    
-# class Rescale(object):
-
-#     def __init__(self, output_size):
-#         assert isinstance(output_size, (int, tuple))
-#         self.output_size = output_size
-
-#     def __call__(self, sample):
-#         image_, pose_ = sample['image'], sample['pose']
-
-#         h, w = image_.shape[:2]
-#         if isinstance(self.output_size, int):
-#             if h > w:
-#                 new_h, new_w = self.output_size * h / w, self.output_size
-#             else:
-#                 new_h, new_w = self.output_size, self.output_size * w / h
-#         else:
-#             new_h, new_w = self.output_size
-
-#         new_h, new_w = int(new_h), int(new_w)
-
-#         image = transform.resize(image_, (new_h, new_w))
-#         pose = (pose_.reshape([-1,2])/np.array([w,h])*np.array([new_w,new_h])).flatten()
-#         return {'image': image, 'pose': pose}
 
 class Rescale(object):
     

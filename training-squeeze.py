@@ -26,17 +26,15 @@ print("GPU : %d"%(torch.cuda.device_count()))
 name = "yh"
 ROOT_DIR = "/home/yuliang/code/deeppose_tf/datasets/mpii"
 PATH_PREFIX = '/home/yuliang/code/DeepPose-pytorch/models/{}/'.format(name)
-batchsize = 256
 
 train_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'train_joints.csv'),
                                   transform=transforms.Compose([
-                                               Augmentation(),
                                                Rescale((224,224)),
                                                Expansion(),
                                                ToTensor()
                                            ]))
-train_dataloader = DataLoader(train_dataset, batch_size=batchsize,
-                        shuffle=False, num_workers = 20)
+train_dataloader = DataLoader(train_dataset, batch_size=256,
+                        shuffle=False, num_workers = 10)
 
 test_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'test_joints.csv'),
                                   transform=transforms.Compose([
@@ -44,32 +42,28 @@ test_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'test_joints.csv'),
                                                Expansion(),
                                                ToTensor()
                                            ]))
-test_dataloader = DataLoader(test_dataset, batch_size=batchsize,
-                        shuffle=False, num_workers = 20)
+test_dataloader = DataLoader(test_dataset, batch_size=256,
+                        shuffle=False, num_workers = 10)
 
 class Net(nn.Module):
 
     def __init__(self):
         super(Net, self).__init__()
-        model = models.resnet18(pretrained=True)
-        model.conv1 = nn.Conv2d(5, 64, kernel_size=7, stride=2, padding=3,bias=False)
-        model.fc=nn.Linear(512,32)
+        model = models.SqueezeNet(version=1.1, num_classes=32)
         for param in model.parameters():
             param.requires_grad = True
-        self.resnet = model.cuda()
+        self.squeeze = model.cuda()
         
     def forward(self, x):
-       
-        pose_out = self.resnet(x)
+        pose_out = self.squeeze(x)
         return pose_out
 
 net = Net()
 gpus = [0,1]
 # net = torch.load('models/yh/final.t7').cuda(device_id=gpus[0])
 criterion = nn.MSELoss().cuda()
-# optimizer = optim.SGD(filter(lambda p: p.requires_grad, net.parameters()), lr=0.0005, momentum=0.9)
+# optimizer = optim.SGD(filter(lambda p: p.requires_grad, net.parameters()), lr=0.001, momentum=0.9)
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
-
 
 def mse_loss(input, target):
     return torch.sum(torch.pow(input - target,2)) / input.nelement()
@@ -77,9 +71,7 @@ def mse_loss(input, target):
 train_loss_all = []
 valid_loss_all = []
 
-minloss = np.float("inf")
-
-for epoch in tqdm(range(1000)):  # loop over the dataset multiple times
+for epoch in tqdm(range(100)):  # loop over the dataset multiple times
     
     train_loss_epoch = []
     for i, data in enumerate(train_dataloader):
@@ -94,24 +86,20 @@ for epoch in tqdm(range(1000)):  # loop over the dataset multiple times
         train_loss_epoch.append(loss.data[0])
 
     if epoch%2==0:
+        checkpoint_file = PATH_PREFIX + 'squeezenet-checkpoint{}.t7'.format(epoch)
+        torch.save(net, checkpoint_file)
+        print('==> checkpoint model saving to %s'%checkpoint_file)
         valid_loss_epoch = []
         for i_batch, sample_batched in enumerate(test_dataloader):
 
-            net_forward = net.cuda()
+            net_forward = torch.load(checkpoint_file).cuda()
             images = sample_batched['image'].cuda()
             poses = sample_batched['pose'].cuda()
             outputs = net_forward(Variable(images, volatile=True))
             valid_loss_epoch.append(mse_loss(outputs.data,poses))
-
-        if np.mean(np.array(valid_loss_epoch)) < minloss:
-            minloss = np.mean(np.array(valid_loss_epoch))
-            checkpoint_file = PATH_PREFIX + 'final-noaug.t7'.format(epoch)
-            torch.save(net, checkpoint_file)
-            print('==> checkpoint model saving to %s'%checkpoint_file)
-
         print('[epoch %d] train loss: %.8f, valid loss: %.8f' %
           (epoch + 1, np.mean(np.array(train_loss_epoch)), np.mean(np.array(valid_loss_epoch))))
-        with open(PATH_PREFIX+"resnet-log.txt", 'a+') as file_output:
+        with open(PATH_PREFIX+"squeeze-log.txt", 'w+') as file_output:
             file_output.write('[epoch %d] train loss: %.8f, valid loss: %.8f\n' %
               (epoch + 1, np.mean(np.array(train_loss_epoch)), np.mean(np.array(valid_loss_epoch))))
             file_output.flush() 

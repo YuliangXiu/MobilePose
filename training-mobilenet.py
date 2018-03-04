@@ -20,11 +20,10 @@ import warnings
 warnings.filterwarnings('ignore')
 
 from dataloader import *
-from utils import *
 from mobilenetv2 import *
 
 
-os.environ["CUDA_VISIBLE_DEVICES"]="1"
+os.environ["CUDA_VISIBLE_DEVICES"]="0"
 # torch.cuda.set_device(1) 
 torch.backends.cudnn.enabled = True
 print("GPU : %d"%(torch.cuda.device_count()))
@@ -68,7 +67,7 @@ else:
     # switch to train mode
     net.train()
     
-optimizer = optim.SGD(filter(lambda p: p.requires_grad, net.parameters()), lr=0.001, momentum=0.9)
+optimizer = optim.SGD(filter(lambda p: p.requires_grad, net.parameters()), lr=0.0001, momentum=0.9)
 
 def mse_loss(input, target):
     return torch.sum(torch.pow(input - target,2)) / input.nelement()
@@ -77,7 +76,7 @@ train_loss_all = []
 valid_loss_all = []
 
 
-for epoch in tqdm(range(1000)):  # loop over the dataset multiple times
+for epoch in tqdm(range(200)):  # loop over the dataset multiple times
     
     train_loss_epoch = []
     for i, data in enumerate(train_dataloader):
@@ -116,7 +115,7 @@ for epoch in tqdm(range(1000)):  # loop over the dataset multiple times
         print('[epoch %d] train loss: %.8f, valid loss: %.8f' %
           (epoch + 1, np.mean(np.array(train_loss_epoch)), np.mean(np.array(valid_loss_epoch))))
         
-        with open(PATH_PREFIX+"log", 'a+') as file_output:
+        with open(PATH_PREFIX+"mobile-log.txt", 'a+') as file_output:
             file_output.write('[epoch %d] train loss: %.8f, valid loss: %.8f\n' %
               (epoch + 1, np.mean(np.array(train_loss_epoch)), np.mean(np.array(valid_loss_epoch))))
             file_output.flush() 

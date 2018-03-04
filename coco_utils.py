@@ -1,7 +1,6 @@
-
 # define coco class
 import json
-import numpy
+import numpy as np
 from collections import namedtuple, Mapping
 
 # Create namedtuple without defaults
@@ -18,11 +17,11 @@ def namedtuple_with_defaults(typename, field_names, default_values=()):
 # Used for solving TypeError: Object of type 'float32' is not JSON serializable
 class MyEncoder(json.JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, numpy.integer):
+        if isinstance(obj, np.integer):
             return int(obj)
-        elif isinstance(obj, numpy.floating):
+        elif isinstance(obj, np.floating):
             return float(obj)
-        elif isinstance(obj, numpy.ndarray):
+        elif isinstance(obj, np.ndarray):
             return obj.tolist()
         else:
             return super(MyEncoder, self).default(obj)

@@ -30,7 +30,6 @@ batchsize = 256
 
 train_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'train_joints.csv'),
                                   transform=transforms.Compose([
-                                               Augmentation(),
                                                Rescale((224,224)),
                                                Expansion(),
                                                ToTensor()
@@ -68,7 +67,7 @@ gpus = [0,1]
 # net = torch.load('models/yh/final.t7').cuda(device_id=gpus[0])
 criterion = nn.MSELoss().cuda()
 # optimizer = optim.SGD(filter(lambda p: p.requires_grad, net.parameters()), lr=0.0005, momentum=0.9)
-optimizer = optim.SGD(filter(lambda p: p.requires_grad, net.parameters()), lr=0.001, momentum=0.9)
+optimizer = optim.SGD(filter(lambda p: p.requires_grad, net.parameters()), lr=0.0001, momentum=0.9)
 
 
 def mse_loss(input, target):
@@ -93,7 +92,7 @@ for epoch in tqdm(range(1000)):  # loop over the dataset multiple times
 
         train_loss_epoch.append(loss.data[0])
 
-    if epoch%20==0:
+    if epoch%5==0:
         valid_loss_epoch = []
         for i_batch, sample_batched in enumerate(test_dataloader):
 

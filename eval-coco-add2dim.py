@@ -110,7 +110,7 @@ mdir="/home/yuliang/code/DeepPose-pytorch/models/{}".format(name)
 #     eval_coco(full_name, os.path.join(PATH_PREFIX, 'result-gt-{}-json.txt'.format(i)),\
 #     os.path.join(PATH_PREFIX, 'result-pred-{}-json.txt'.format(i)))
 
-filename = "checkpoint70.t7"
+filename = "final-noaug.t7"
 full_name = os.path.join(mdir, filename)
 eval_coco(full_name, os.path.join(PATH_PREFIX, 'result-gt-json.txt'), os.path.join(PATH_PREFIX, 'result-pred-json.txt'))
 

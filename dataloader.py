@@ -16,12 +16,12 @@ import cv2
 def expand_bbox(left, right, top, bottom, img_width, img_height):
     width = right-left
     height = bottom-top
-    ratio = 0.1
+    ratio = 0.15
     new_left = np.clip(left-ratio*width,0,img_width)
     new_right = np.clip(right+ratio*width,0,img_width)
     new_top = np.clip(top-ratio*height,0,img_height)
     new_bottom = np.clip(bottom+ratio*height,0,img_height)
-    
+
     return [int(new_left), int(new_top), int(new_right), int(new_bottom)]
 
 class Rescale(object):
@@ -42,7 +42,7 @@ class Rescale(object):
         right_pad = (self.output_size[1] - new_w) - left_pad
         top_pad = (self.output_size[0] - new_h) // 2
         bottom_pad = (self.output_size[0] - new_h) - top_pad
-        mean=np.array([0.485, 0.456, 0.406])
+        mean=np.array([0.485, 0.456, 0.406])*256
         pad = ((top_pad, bottom_pad), (left_pad, right_pad))
         image = np.stack([np.pad(image[:,:,c], pad, mode='constant', constant_values=mean[c]) 
                         for c in range(3)], axis=2)

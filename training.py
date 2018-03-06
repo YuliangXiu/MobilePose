@@ -35,7 +35,7 @@ train_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'train_joints.csv'),
                                                ToTensor()
                                            ]))
 train_dataloader = DataLoader(train_dataset, batch_size=batchsize,
-                        shuffle=False, num_workers = 20)
+                        shuffle=False, num_workers = 10)
 
 test_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'test_joints.csv'),
                                   transform=transforms.Compose([
@@ -44,7 +44,7 @@ test_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'test_joints.csv'),
                                                ToTensor()
                                            ]))
 test_dataloader = DataLoader(test_dataset, batch_size=batchsize,
-                        shuffle=False, num_workers = 20)
+                        shuffle=False, num_workers = 10)
 
 class Net(nn.Module):
 
@@ -64,7 +64,7 @@ class Net(nn.Module):
 
 net = Net().cuda()
 gpus = [0,1]
-# net = torch.load('models/yh/final.t7').cuda(device_id=gpus[0])
+# net = torch.load('models/yh/final-noaug.t7').cuda(device_id=gpus[0])
 criterion = nn.MSELoss().cuda()
 # optimizer = optim.SGD(filter(lambda p: p.requires_grad, net.parameters()), lr=0.0005, momentum=0.9)
 optimizer = optim.SGD(filter(lambda p: p.requires_grad, net.parameters()), lr=0.0001, momentum=0.9)

@@ -16,7 +16,7 @@ import cv2
 def expand_bbox(left, right, top, bottom, img_width, img_height):
     width = right-left
     height = bottom-top
-    ratio = 0.15
+    ratio = np.random.random_sample()*0.3
     new_left = np.clip(left-ratio*width,0,img_width)
     new_right = np.clip(right+ratio*width,0,img_width)
     new_top = np.clip(top-ratio*height,0,img_height)
@@ -42,7 +42,7 @@ class Rescale(object):
         right_pad = (self.output_size[1] - new_w) - left_pad
         top_pad = (self.output_size[0] - new_h) // 2
         bottom_pad = (self.output_size[0] - new_h) - top_pad
-        mean=np.array([0.485, 0.456, 0.406])*256
+        mean=np.array([0.485, 0.456, 0.406])
         pad = ((top_pad, bottom_pad), (left_pad, right_pad))
         image = np.stack([np.pad(image[:,:,c], pad, mode='constant', constant_values=mean[c]) 
                         for c in range(3)], axis=2)
@@ -72,9 +72,16 @@ class ToTensor(object):
 
     def __call__(self, sample):
         image, pose = sample['image'], sample['pose']
-        mean=np.array([0.485, 0.456, 0.406])
-        std=np.array([0.229, 0.224, 0.225])
-        image[:,:,:3] = (image[:,:,:3]-mean)/std
+        h, w = image.shape[:2]
+
+        x_mean = np.mean(image[:,:,3])
+        x_std = np.std(image[:,:,3])
+        y_mean = np.mean(image[:,:,4])
+        y_std = np.std(image[:,:,4])
+
+        mean=np.array([0.485, 0.456, 0.406, x_mean, y_mean])
+        std=np.array([0.229, 0.224, 0.225, x_std, y_std])
+        image = (image-mean)/(std)
         image = torch.from_numpy(image.transpose((2, 0, 1))).float()
         pose = torch.from_numpy(pose).float()
         
@@ -96,7 +103,7 @@ class PoseDataset(Dataset):
         ROOT_DIR = "/home/yuliang/code/deeppose_tf/datasets/mpii"
         line = self.f_csv[idx][0].split(",")
         img_path = os.path.join(ROOT_DIR,'images',line[0])
-        image = io.imread(img_path)
+        image = io.imread(img_path)/256.0
         height, width = image.shape[0], image.shape[1]
         pose = np.array([float(item) for item in line[1:]]).reshape([-1,2])
         

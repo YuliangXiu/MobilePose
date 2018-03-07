@@ -26,9 +26,9 @@ print(torch.cuda.device_count())
 gpus = [0,1]
 
 
-checkpoint_path = "./checkpoint20.t7"
+checkpoint_path = "./scale2-checkpoint100.t7"
 net = torch.load(checkpoint_path, map_location={'cuda:1' : 'cuda:1', 'cuda:0': 'cuda:0'}).cuda(device_id=gpus[0])
 # net = torch.load(checkpoint_path)
 net_cpu = net.cpu()
-torch.save(net_cpu, "./checkpoint-cpu-20.t7")
-torch.save(net_cpu.state_dict(), "./checkpoint-cpu-20-state.t7")
+torch.save(net_cpu, "./scale2-checkpoint-cpu-100.t7")
+torch.save(net_cpu.state_dict(), "./scale2-checkpoint-cpu-100-state.t7")

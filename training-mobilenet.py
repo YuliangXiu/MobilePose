@@ -29,10 +29,12 @@ torch.backends.cudnn.enabled = True
 print("GPU : %d"%(torch.cuda.device_count()))
 
 
+name = "czx"
 ROOT_DIR = "/home/yuliang/code/deeppose_tf/datasets/mpii"
+PATH_PREFIX = '/home/yuliang/code/DeepPose-pytorch/models/{}/'.format(name)
 
-batch_size = 128
-input_size = 224
+batch_size = 80
+input_size = 256
 
 train_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'train_joints.csv'),
                                   transform=transforms.Compose([
@@ -67,7 +69,7 @@ else:
     # switch to train mode
     net.train()
     
-optimizer = optim.SGD(filter(lambda p: p.requires_grad, net.parameters()), lr=0.0001, momentum=0.9)
+optimizer = optim.SGD(filter(lambda p: p.requires_grad, net.parameters()), lr=1e-07, momentum=0.9)
 
 def mse_loss(input, target):
     return torch.sum(torch.pow(input - target,2)) / input.nelement()
@@ -75,8 +77,10 @@ def mse_loss(input, target):
 train_loss_all = []
 valid_loss_all = []
 
+minloss = float("inf")
 
-for epoch in tqdm(range(200)):  # loop over the dataset multiple times
+
+for epoch in range(1000):  # loop over the dataset multiple times
     
     train_loss_epoch = []
     for i, data in enumerate(train_dataloader):
@@ -94,27 +98,24 @@ for epoch in tqdm(range(200)):  # loop over the dataset multiple times
 
         train_loss_epoch.append(loss.data[0])
 
-    if epoch%10==0:
-        PATH_PREFIX = '/home/yuliang/code/DeepPose-pytorch/models/czx/'
-        checkpoint_file = PATH_PREFIX + 'checkpoint{}.t7'.format(epoch)
-        torch.save(net, checkpoint_file)
-        print('==> checkpoint model saving to %s'%checkpoint_file)
-
+    if epoch%5==0:
         valid_loss_epoch = []
         for i_batch, sample_batched in enumerate(test_dataloader):
-            if useCuda:
-                net_forward = torch.load(checkpoint_file).cuda()
-                images = sample_batched['image'].cuda()
-                poses = sample_batched['pose'].cuda()
-            else:
-                net_forward = torch.load(checkpoint_file)
-                images = sample_batched['image']
-                poses = sample_batched['pose']
+
+            net_forward = net
+            images = sample_batched['image'].cuda()
+            poses = sample_batched['pose'].cuda()
             outputs = net_forward(Variable(images, volatile=True))
             valid_loss_epoch.append(mse_loss(outputs.data,poses))
+
+        if np.mean(np.array(valid_loss_epoch)) < minloss:
+            minloss = np.mean(np.array(valid_loss_epoch))
+            checkpoint_file = PATH_PREFIX + 'final-noaug-mobilenet.t7'.format(epoch)
+            torch.save(net, checkpoint_file)
+            print('==> checkpoint model saving to %s'%checkpoint_file)
+
         print('[epoch %d] train loss: %.8f, valid loss: %.8f' %
           (epoch + 1, np.mean(np.array(train_loss_epoch)), np.mean(np.array(valid_loss_epoch))))
-        
         with open(PATH_PREFIX+"mobile-log.txt", 'a+') as file_output:
             file_output.write('[epoch %d] train loss: %.8f, valid loss: %.8f\n' %
               (epoch + 1, np.mean(np.array(train_loss_epoch)), np.mean(np.array(valid_loss_epoch))))

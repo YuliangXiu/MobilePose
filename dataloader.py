@@ -16,7 +16,8 @@ import cv2
 def expand_bbox(left, right, top, bottom, img_width, img_height):
     width = right-left
     height = bottom-top
-    ratio = np.random.random_sample()*0.3
+    ratio = np.random.random_sample()*0.2
+    # ratio = 0.15
     new_left = np.clip(left-ratio*width,0,img_width)
     new_right = np.clip(right+ratio*width,0,img_width)
     new_top = np.clip(top-ratio*height,0,img_height)
@@ -103,7 +104,7 @@ class PoseDataset(Dataset):
         ROOT_DIR = "/home/yuliang/code/deeppose_tf/datasets/mpii"
         line = self.f_csv[idx][0].split(",")
         img_path = os.path.join(ROOT_DIR,'images',line[0])
-        image = io.imread(img_path)/256.0
+        image = io.imread(img_path)
         height, width = image.shape[0], image.shape[1]
         pose = np.array([float(item) for item in line[1:]]).reshape([-1,2])
         
@@ -150,16 +151,18 @@ class Augmentation(object):
         image, pose= sample['image'], sample['pose'].reshape([-1,2])
 
         # augmentation choices
-        seq = iaa.SomeOf(3, [
+        seq = iaa.SomeOf(2, [
             iaa.Sometimes(0.2, iaa.Scale((0.5, 1.0))),
-            iaa.Sometimes(0.7, iaa.CropAndPad(percent=(-0.25, 0.25), pad_mode=["edge"], keep_size=False)),
-            iaa.Fliplr(0.4), 
+            iaa.Sometimes(0.3, iaa.CropAndPad(percent=(-0.25, 0.25), pad_mode=["edge"], keep_size=False)),
+            iaa.Fliplr(0.5), 
             iaa.Sometimes(0.3, iaa.AdditiveGaussianNoise(scale=(0, 0.05*50))),
             iaa.Sometimes(0.2, iaa.GaussianBlur(sigma=(0, 3.0)))
         ])
         seq_det = seq.to_deterministic()
 
-        image_aug = seq_det.augment_images([image])[0]
+        image_aug = seq_det.augment_images([image])[0]/256.0
+        # print(image_aug.shape)
+        # print(np.max(image_aug))
         keypoints_aug = seq_det.augment_keypoints([self.pose2keypoints(image,pose)])[0]
 
-        return {'image': image_aug/256.0, 'pose': self.keypoints2pose(keypoints_aug)}
+        return {'image': image_aug, 'pose': self.keypoints2pose(keypoints_aug)}

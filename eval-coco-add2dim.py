@@ -52,6 +52,7 @@ test_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'test_joints.csv'),
                                            ToTensor()
                                        ]))
 test_dataset_size = len(test_dataset)
+# test_dataset_size = 5
 test_dataloader = DataLoader(test_dataset, batch_size=test_dataset_size,
                         shuffle=False, num_workers = 20)
 # get all test data
@@ -110,7 +111,7 @@ mdir="/home/yuliang/code/DeepPose-pytorch/models/{}".format(name)
 #     eval_coco(full_name, os.path.join(PATH_PREFIX, 'result-gt-{}-json.txt'.format(i)),\
 #     os.path.join(PATH_PREFIX, 'result-pred-{}-json.txt'.format(i)))
 
-filename = "final-noaug.t7"
+filename = "final.t7"
 full_name = os.path.join(mdir, filename)
 eval_coco(full_name, os.path.join(PATH_PREFIX, 'result-gt-json.txt'), os.path.join(PATH_PREFIX, 'result-pred-json.txt'))
 

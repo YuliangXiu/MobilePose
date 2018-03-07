@@ -26,11 +26,13 @@ print("GPU : %d"%(torch.cuda.device_count()))
 name = "yh"
 ROOT_DIR = "/home/yuliang/code/deeppose_tf/datasets/mpii"
 PATH_PREFIX = '/home/yuliang/code/DeepPose-pytorch/models/{}/'.format(name)
-batchsize = 256
+batchsize = 200
+inputsize = 230
 
 train_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'train_joints.csv'),
                                   transform=transforms.Compose([
-                                               Rescale((224,224)),
+                                            #    Augmentation(),
+                                               Rescale((inputsize,inputsize)),
                                                Expansion(),
                                                ToTensor()
                                            ]))
@@ -39,7 +41,7 @@ train_dataloader = DataLoader(train_dataset, batch_size=batchsize,
 
 test_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'test_joints.csv'),
                                   transform=transforms.Compose([
-                                               Rescale((224,224)),
+                                               Rescale((inputsize,inputsize)),
                                                Expansion(),
                                                ToTensor()
                                            ]))
@@ -51,7 +53,7 @@ class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
         model = models.resnet18(pretrained=True)
-        model.conv1 = nn.Conv2d(5, 64, kernel_size=7, stride=2, padding=3,bias=False)
+        model.conv1 = nn.Conv2d(5, 64, kernel_size=7, stride=2, padding=3,bias=True)
         model.fc=nn.Linear(512,32)
         for param in model.parameters():
             param.requires_grad = True
@@ -64,10 +66,12 @@ class Net(nn.Module):
 
 net = Net().cuda()
 gpus = [0,1]
-# net = torch.load('models/yh/final-noaug.t7').cuda(device_id=gpus[0])
+net = torch.load('models/yh/final-noaug-adam.t7').cuda(device_id=gpus[0])
 criterion = nn.MSELoss().cuda()
 # optimizer = optim.SGD(filter(lambda p: p.requires_grad, net.parameters()), lr=0.0005, momentum=0.9)
-optimizer = optim.SGD(filter(lambda p: p.requires_grad, net.parameters()), lr=0.0001, momentum=0.9)
+# optimizer = optim.SGD(filter(lambda p: p.requires_grad, net.parameters()), lr=1e-06, momentum=0.9)
+optimizer = optim.Adam(net.parameters(), lr=1e-05, betas=(0.9, 0.999), eps=1e-08)
+# optimizer = optim.SGD(net.parameters(), lr=1e-06, momentum=0.9)
 
 
 def mse_loss(input, target):
@@ -76,9 +80,9 @@ def mse_loss(input, target):
 train_loss_all = []
 valid_loss_all = []
 
-minloss = np.float("inf")
+minloss = 302.0
 
-for epoch in tqdm(range(1000)):  # loop over the dataset multiple times
+for epoch in range(1000):  # loop over the dataset multiple times
     
     train_loss_epoch = []
     for i, data in enumerate(train_dataloader):
@@ -104,7 +108,7 @@ for epoch in tqdm(range(1000)):  # loop over the dataset multiple times
 
         if np.mean(np.array(valid_loss_epoch)) < minloss:
             minloss = np.mean(np.array(valid_loss_epoch))
-            checkpoint_file = PATH_PREFIX + 'final-noaug.t7'.format(epoch)
+            checkpoint_file = PATH_PREFIX + 'final-noaug-adam.t7'.format(epoch)
             torch.save(net, checkpoint_file)
             print('==> checkpoint model saving to %s'%checkpoint_file)
 

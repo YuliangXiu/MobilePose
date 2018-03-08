@@ -3,6 +3,7 @@
 *.t7
 *.jpg
 *.txt
+*.pyc
 models
 __pycache__
 .ipynb_checkpoints

@@ -45,7 +45,7 @@ if __name__ == '__main__':
 
     if modeltype =='resnet':
         pretrain = True
-        minloss = 281.0
+        minloss = 277.0
         learning_rate = 1e-06
         net = Net().cuda()
         inputsize = 227

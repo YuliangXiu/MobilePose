@@ -45,13 +45,14 @@ if __name__ == '__main__':
 
     if modeltype =='resnet':
         pretrain = True
-        minloss = 277.0
-        learning_rate = 1e-06
+        batchsize = 256
+        minloss = 272.39445690
+        learning_rate = 1e-07
         net = Net().cuda()
         inputsize = 227
     elif modeltype == "mobilenet":
         pretrain = False
-        minloss = 885.0
+        minloss = float("inf")
         learning_rate = 1e-04
         net = MobileNetV2(image_channel=5).cuda()
         inputsize = 224
@@ -72,7 +73,7 @@ if __name__ == '__main__':
 
     train_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'train_joints.csv'),
                                     transform=transforms.Compose([
-                                                #    Augmentation(),
+                                                Augmentation(),
                                                 Rescale((inputsize,inputsize)),
                                                 Expansion(),
                                                 ToTensor()
@@ -91,8 +92,8 @@ if __name__ == '__main__':
 
 
     criterion = nn.MSELoss().cuda()
-    optimizer = optim.Adam(net.parameters(), lr=learning_rate, betas=(0.9, 0.999), eps=1e-08)
-    # optimizer = optim.SGD(net.parameters(), lr=1e-06, momentum=0.9)
+    # optimizer = optim.Adam(net.parameters(), lr=learning_rate, betas=(0.9, 0.999), eps=1e-08)
+    optimizer = optim.SGD(net.parameters(), lr=learning_rate, momentum=0.9)
 
 
     def mse_loss(input, target):

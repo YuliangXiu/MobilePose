@@ -1,3 +1,16 @@
+'''
+File: coco_utils.py
+Project: DeepPose
+File Created: Saturday, 3rd March 2018 7:04:57 pm
+Author: Yuliang Xiu (yuliangxiu@sjtu.edu.cn)
+-----
+Last Modified: Thursday, 8th March 2018 3:02:15 pm
+Modified By: Yuliang Xiu (yuliangxiu@sjtu.edu.cn>)
+-----
+Copyright 2018 - 2018 Shanghai Jiao Tong University, Machine Vision and Intelligence Group
+'''
+
+
 # define coco class
 import json
 import numpy as np

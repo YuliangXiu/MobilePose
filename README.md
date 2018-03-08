@@ -18,7 +18,6 @@ Reproduce Google's [DeepPose](https://arxiv.org/pdf/1312.4659.pdf) with Resnet18
 - [x] support LSP dataset
 - [x] normalization(/256 mean std)
 - [x] adding weighted loss(coco keypoints weight) 
-- [ ] Teacher-Student Learning
 - [x] support Macbook camera realtime skeleton display demo
 
 ## Usage

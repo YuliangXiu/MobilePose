@@ -1,3 +1,21 @@
+'''
+File: dataloader.py
+Project: DeepPose
+File Created: Thursday, 8th March 2018 3:00:27 pm
+Author: Yuliang Xiu (yuliangxiu@sjtu.edu.cn)
+-----
+Last Modified: Thursday, 8th March 2018 3:00:39 pm
+Modified By: Yuliang Xiu (yuliangxiu@sjtu.edu.cn>)
+-----
+Copyright 2018 - 2018 Shanghai Jiao Tong University, Machine Vision and Intelligence Group
+'''
+
+import csv
+import numpy as np
+import os
+from skimage import io, transform
+import cv2
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -6,24 +24,57 @@ import torch.backends.cudnn as cudnn
 from torch.utils.data import Dataset, DataLoader
 from torchvision import datasets, transforms, utils, models
 from torch.autograd import Variable
-import csv
-import numpy as np
-import os
-from skimage import io, transform
-import cv2
 
+# import matplotlib.pyplot as plt
+
+def crop_camera(image, ratio=0.15):
+    height = image.shape[0]
+    width = image.shape[1]
+    mid_width = width / 2.0
+    width_20 = width * ratio
+    crop_img = image[0:int(height), int(mid_width - width_20):int(mid_width + width_20)]
+    return crop_img
 
 def expand_bbox(left, right, top, bottom, img_width, img_height):
     width = right-left
     height = bottom-top
-    ratio = np.random.random_sample()*0.2
-    # ratio = 0.15
+    # ratio = np.random.random_sample()*0.2
+    ratio = 0.15
     new_left = np.clip(left-ratio*width,0,img_width)
     new_right = np.clip(right+ratio*width,0,img_width)
     new_top = np.clip(top-ratio*height,0,img_height)
     new_bottom = np.clip(bottom+ratio*height,0,img_height)
 
     return [int(new_left), int(new_top), int(new_right), int(new_bottom)]
+
+# Rescale implementation of mobilenetV2
+
+class Warp(object):
+    
+    def __init__(self, output_size):
+        assert isinstance(output_size, (int, tuple))
+        self.output_size = output_size
+
+    def __call__(self, sample):
+        image_, pose_ = sample['image'], sample['pose']
+
+        h, w = image_.shape[:2]
+        if isinstance(self.output_size, int):
+            if h > w:
+                new_h, new_w = self.output_size * h / w, self.output_size
+            else:
+                new_h, new_w = self.output_size, self.output_size * w / h
+        else:
+            new_h, new_w = self.output_size
+
+        new_h, new_w = int(new_h), int(new_w)
+
+        image = transform.resize(image_, (new_w, new_h))
+        pose = (pose_.reshape([-1,2])/np.array([w,h])*np.array([new_w,new_h])).flatten()
+        return {'image': image, 'pose': pose}
+
+
+# Rescale implementation of Resnet18
 
 class Rescale(object):
 
@@ -53,6 +104,7 @@ class Rescale(object):
 
         return {'image': image, 'pose': pose}
 
+
 class Expansion(object):
     
     def __call__(self, sample):
@@ -63,8 +115,7 @@ class Expansion(object):
         x, y = np.meshgrid(x, y)
         x = x[:,:, np.newaxis]
         y = y[:,:, np.newaxis]
-        image = np.concatenate((image, x), axis=2)
-        image = np.concatenate((image, y), axis=2)
+        image = np.concatenate((image, x, y), axis=2)
         
         return {'image': image,
                 'pose': pose}

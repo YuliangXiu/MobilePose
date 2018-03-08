@@ -1,3 +1,15 @@
+'''
+File: mobilenetv2.py
+Project: DeepPose
+File Created: Thursday, 8th March 2018 2:51:18 pm
+Author: Yuliang Xiu (yuliangxiu@sjtu.edu.cn)
+-----
+Last Modified: Thursday, 8th March 2018 3:01:19 pm
+Modified By: Yuliang Xiu (yuliangxiu@sjtu.edu.cn>)
+-----
+Copyright 2018 - 2018 Shanghai Jiao Tong University, Machine Vision and Intelligence Group
+'''
+
 import torch.nn as nn
 import math
 
@@ -48,7 +60,7 @@ class InvertedResidual(nn.Module):
 
 
 class MobileNetV2(nn.Module):
-    def __init__(self, n_class=32, input_size=256, width_mult=1.):
+    def __init__(self, image_channel=5, n_class=32, input_size=224, width_mult=1.):
         super(MobileNetV2, self).__init__()
         # setting of inverted residual blocks
         self.interverted_residual_setting = [
@@ -67,7 +79,7 @@ class MobileNetV2(nn.Module):
         input_channel = int(32 * width_mult)
         self.last_channel = int(1280 * width_mult) if width_mult > 1.0 else 1280
 #         self.last_channel = int(1280 * width_mult) if width_mult > 1.0 else 32
-        self.features = [conv_bn(5, input_channel, 2)]
+        self.features = [conv_bn(image_channel, input_channel, 2)]
         # building inverted residual blocks
         for t, c, n, s in self.interverted_residual_setting:
             output_channel = int(c * width_mult)
@@ -85,11 +97,12 @@ class MobileNetV2(nn.Module):
 
         # building classifier
         self.classifier = nn.Sequential(
-            nn.Dropout(),
+            nn.Dropout(p=0.5),
             nn.Linear(self.last_channel, n_class),
         )
 
         self._initialize_weights()
+#         print(width_mult)
 
     def forward(self, x):
         x = self.features(x)

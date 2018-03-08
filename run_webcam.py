@@ -1,0 +1,59 @@
+'''
+File: run_webcam.py
+Project: DeepPose
+File Created: Thursday, 8th March 2018 2:19:39 pm
+Author: Yuliang Xiu (yuliangxiu@sjtu.edu.cn)
+-----
+Last Modified: Thursday, 8th March 2018 3:01:35 pm
+Modified By: Yuliang Xiu (yuliangxiu@sjtu.edu.cn>)
+-----
+Copyright 2018 - 2018 Shanghai Jiao Tong University, Machine Vision and Intelligence Group
+'''
+
+import argparse
+import logging
+import time
+
+import cv2
+import numpy as np
+
+import torch
+import torch.nn as nn
+from torchvision import models
+
+from estimator import ResEstimator
+import matplotlib.pyplot as plt
+from networks import *
+from dataloader import crop_camera
+
+if __name__ == '__main__':
+    
+    parser = argparse.ArgumentParser(description='deeppose realtime webcam')
+    parser.add_argument('--model', type=str, default='resnet', help='mobilenet|resnet')
+    parser.add_argument('--camera', type=int, default=0)
+
+    args = parser.parse_args()
+
+    w, h = model_wh(get_graph_path(args.model))
+    e = ResEstimator(get_graph_path(args.model), target_size=(w,h))
+    cam = cv2.VideoCapture(args.camera)
+
+    ret_val, image = cam.read()
+    image = crop_camera(image)
+
+    while True:
+        fps_time = time.time()
+        ret_val , image = cam.read()
+        image = crop_camera(image)
+        humans = e.inference(image, args.model)
+        image = ResEstimator.draw_humans(image, humans, imgcopy=False)
+
+        cv2.putText(image,
+                    "FPS: %f" % (1.0 / (time.time() - fps_time)),
+                    (10, 10),  cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                    (0, 255, 0), 2)
+        cv2.imshow('tf-pose-estimation result', image)
+        if cv2.waitKey(1) == 27: # ESC
+            break
+
+    cv2.destroyAllWindows()

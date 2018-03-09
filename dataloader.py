@@ -49,14 +49,14 @@ def expand_bbox(left, right, top, bottom, img_width, img_height):
 
 # Rescale implementation of mobilenetV2
 
-class Warp(object):
+class Wrap(object):
     
     def __init__(self, output_size):
         assert isinstance(output_size, (int, tuple))
         self.output_size = output_size
 
     def __call__(self, sample):
-        image_, pose_ = sample['image'], sample['pose']
+        image_, pose_ = sample['image']/256.0, sample['pose']
 
         h, w = image_.shape[:2]
         if isinstance(self.output_size, int):
@@ -78,12 +78,13 @@ class Warp(object):
 
 class Rescale(object):
 
+
     def __init__(self, output_size):
         assert isinstance(output_size, (int, tuple))
         self.output_size = output_size
 
     def __call__(self, sample):
-        image_, pose_ = sample['image'], sample['pose']
+        image_, pose_ = sample['image']/256.0, sample['pose']
         h, w = image_.shape[:2]
         im_scale = min(float(self.output_size[0]) / float(h), float(self.output_size[1]) / float(w))
         new_h = int(image_.shape[0] * im_scale)
@@ -133,6 +134,10 @@ class ToTensor(object):
 
         mean=np.array([0.485, 0.456, 0.406, x_mean, y_mean])
         std=np.array([0.229, 0.224, 0.225, x_std, y_std])
+
+        # mean=np.array([0.485, 0.456, 0.406])
+        # std=np.array([0.229, 0.224, 0.225])
+
         image = (image-mean)/(std)
         image = torch.from_numpy(image.transpose((2, 0, 1))).float()
         pose = torch.from_numpy(pose).float()
@@ -203,17 +208,15 @@ class Augmentation(object):
 
         # augmentation choices
         seq = iaa.SomeOf(2, [
-            iaa.Sometimes(0.2, iaa.Scale((0.5, 1.0))),
-            iaa.Sometimes(0.3, iaa.CropAndPad(percent=(-0.25, 0.25), pad_mode=["edge"], keep_size=False)),
-            iaa.Fliplr(0.5), 
-            iaa.Sometimes(0.3, iaa.AdditiveGaussianNoise(scale=(0, 0.05*50))),
-            iaa.Sometimes(0.2, iaa.GaussianBlur(sigma=(0, 3.0)))
+            iaa.Sometimes(0.4, iaa.Scale((0.5, 1.0))),
+            iaa.Sometimes(0.6, iaa.CropAndPad(percent=(-0.25, 0.25), pad_mode=["edge"], keep_size=False)),
+            iaa.Fliplr(0.1), 
+            iaa.Sometimes(0.4, iaa.AdditiveGaussianNoise(scale=(0, 0.05*50))),
+            iaa.Sometimes(0.1, iaa.GaussianBlur(sigma=(0, 3.0)))
         ])
         seq_det = seq.to_deterministic()
 
-        image_aug = seq_det.augment_images([image])[0]/256.0
-        # print(image_aug.shape)
-        # print(np.max(image_aug))
+        image_aug = seq_det.augment_images([image])[0]
         keypoints_aug = seq_det.augment_keypoints([self.pose2keypoints(image,pose)])[0]
 
         return {'image': image_aug, 'pose': self.keypoints2pose(keypoints_aug)}

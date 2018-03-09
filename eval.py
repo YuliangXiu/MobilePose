@@ -10,7 +10,8 @@ Modified By: Yuliang Xiu (yuliangxiu@sjtu.edu.cn>)
 -----
 Copyright 2018 - 2018 Shanghai Jiao Tong University, Machine Vision and Intelligence Group
 '''
-
+import warnings
+warnings.filterwarnings('ignore')
 
 import torch.nn as nn
 import torch.optim as optim
@@ -33,7 +34,7 @@ from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
 
 gpus = [0,1]
-os.environ["CUDA_VISIBLE_DEVICES"]="1"
+os.environ["CUDA_VISIBLE_DEVICES"]="0"
 torch.backends.cudnn.enabled = True
 print(torch.cuda.device_count())
 
@@ -51,6 +52,8 @@ if __name__ == '__main__':
 
     PATH_PREFIX = "/home/yuliang/code/DeepPose-pytorch/results/{}".format(modeltype)
     full_name="/home/yuliang/code/DeepPose-pytorch/models/{}/{}".format(modeltype, filename)
+    # full_name = "/home/yuliang/code/DeepPose-pytorch/models/demo/mobilenetv2_224x224.t7"
+    # full_name = "/home/yuliang/code/DeepPose-pytorch/models/demo/resnet18_227x227.t7"
     ROOT_DIR = "/home/yuliang/code/deeppose_tf/datasets/mpii"
     
     if modeltype == 'resnet':
@@ -59,10 +62,12 @@ if __name__ == '__main__':
         input_size = 224
 
     print("Loading testing dataset, wait...")
+
     # load dataset
     test_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'test_joints.csv'),
                                 transform=transforms.Compose([
-                                            Rescale((input_size, input_size)),
+                                            Rescale((input_size, input_size)), # for resnet18
+                                            # Wrap((input_size,input_size)), # for mobilenet
                                             Expansion(),
                                             ToTensor()
                                         ]))

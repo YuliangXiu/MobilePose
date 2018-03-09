@@ -36,24 +36,23 @@ if __name__ == '__main__':
     modeltype = args.model
 
     # user defined parameters
-
-    modelname = "final-noaug.t7"
-    batchsize = 128
-    minloss = 885.0
     num_threads = 10
-    learning_rate = 1e-06
 
     if modeltype =='resnet':
+        modelname = "final-aug.t7"
         pretrain = True
         batchsize = 256
-        minloss = 272.39445690
-        learning_rate = 1e-07
+        minloss = 316.52189376 #changed expand ratio
+        # minloss = 272.49565467 #fixed expand ratio
+        learning_rate = 1e-05
         net = Net().cuda()
         inputsize = 227
     elif modeltype == "mobilenet":
-        pretrain = False
-        minloss = float("inf")
-        learning_rate = 1e-04
+        modelname = "final-noaug.t7"
+        pretrain = True
+        batchsize = 128
+        minloss = 337.44666895
+        learning_rate = 1e-06
         net = MobileNetV2(image_channel=5).cuda()
         inputsize = 224
 
@@ -73,8 +72,9 @@ if __name__ == '__main__':
 
     train_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'train_joints.csv'),
                                     transform=transforms.Compose([
-                                                Augmentation(),
+                                                # Augmentation(),
                                                 Rescale((inputsize,inputsize)),
+                                                # Wrap((inputsize,inputsize)),
                                                 Expansion(),
                                                 ToTensor()
                                             ]))
@@ -84,6 +84,7 @@ if __name__ == '__main__':
     test_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'test_joints.csv'),
                                     transform=transforms.Compose([
                                                 Rescale((inputsize,inputsize)),
+                                                # Wrap((inputsize, inputsize)),
                                                 Expansion(),
                                                 ToTensor()
                                             ]))

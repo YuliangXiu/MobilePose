@@ -48,10 +48,11 @@ if __name__ == '__main__':
         net = Net().cuda()
         inputsize = 227
     elif modeltype == "mobilenet":
-        modelname = "final-noaug.t7"
+        modelname = "final-aug.t7"
         pretrain = True
         batchsize = 128
-        minloss = 337.44666895
+        minloss = 396.84708708 # change expand ratio
+        # minloss = 332.48316225 # fixed expand ratio
         learning_rate = 1e-06
         net = MobileNetV2(image_channel=5).cuda()
         inputsize = 224
@@ -117,7 +118,7 @@ if __name__ == '__main__':
 
             train_loss_epoch.append(loss.data[0])
 
-        if epoch%5==0:
+        if epoch%2==0:
             valid_loss_epoch = []
             for i_batch, sample_batched in enumerate(test_dataloader):
 

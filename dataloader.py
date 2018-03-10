@@ -38,8 +38,8 @@ def crop_camera(image, ratio=0.15):
 def expand_bbox(left, right, top, bottom, img_width, img_height):
     width = right-left
     height = bottom-top
-    # ratio = np.random.random_sample()*0.2
-    ratio = 0.15
+    ratio = np.random.random_sample()*0.2
+    # ratio = 0.15
     new_left = np.clip(left-ratio*width,0,img_width)
     new_right = np.clip(right+ratio*width,0,img_width)
     new_top = np.clip(top-ratio*height,0,img_height)

@@ -46,14 +46,14 @@ if __name__ == '__main__':
     modeltype = args.model
 
     # user defined parameters
-    filename = "final-noaug.t7"
+    filename = "final-aug.t7"
     test_dataset_size = 200
     num_threads = 10
 
     PATH_PREFIX = "/home/yuliang/code/DeepPose-pytorch/results/{}".format(modeltype)
     full_name="/home/yuliang/code/DeepPose-pytorch/models/{}/{}".format(modeltype, filename)
     # full_name = "/home/yuliang/code/DeepPose-pytorch/models/demo/mobilenetv2_224x224.t7"
-    # full_name = "/home/yuliang/code/DeepPose-pytorch/models/demo/resnet18_227x227.t7"
+    # full_name = "/home/yuliang/code/DeepPose-pytorch/models/demo/resnet18_227x227-robust.t7"
     ROOT_DIR = "/home/yuliang/code/deeppose_tf/datasets/mpii"
     
     if modeltype == 'resnet':

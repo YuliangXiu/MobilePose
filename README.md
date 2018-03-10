@@ -4,8 +4,8 @@ Reproduce Google's [DeepPose](https://arxiv.org/pdf/1312.4659.pdf) with Resnet18
 ## Functionality
 
 1. **Tiny** trained model (Resnet18[43MB], MobilenetV2[8.9MB])
-2. **Fast** inference speed (>30FPS)
-3. **Accurate** keypoint estimation (30~40mAP)
+2. **Fast** inference speed (GPU>100FPS, CPU~30FPS)
+3. **Accurate** keypoint estimation (75~85mAP(0.5IoU))
 
 ## Requirements:
 - Python 3.6.2

@@ -10,6 +10,7 @@ Modified By: Yuliang Xiu (yuliangxiu@sjtu.edu.cn>)
 -----
 Copyright 2018 - 2018 Shanghai Jiao Tong University, Machine Vision and Intelligence Group
 '''
+
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -53,7 +54,8 @@ if __name__ == '__main__':
     PATH_PREFIX = "/home/yuliang/code/DeepPose-pytorch/results/{}".format(modeltype)
     full_name="/home/yuliang/code/DeepPose-pytorch/models/{}/{}".format(modeltype, filename)
     # full_name = "/home/yuliang/code/DeepPose-pytorch/models/demo/mobilenetv2_224x224-robust.t7"
-    full_name = "/home/yuliang/code/DeepPose-pytorch/models/demo/resnet18_227x227.t7"
+    # full_name = "/home/yuliang/code/DeepPose-pytorch/models/demo/resnet18_227x227.t7"
+    full_name = "/home/yuliang/code/DeepPose-pytorch/models/demo/mobilenet-best.t7"
     ROOT_DIR = "/home/yuliang/code/deeppose_tf/datasets/mpii"
     
     if modeltype == 'resnet':
@@ -66,8 +68,8 @@ if __name__ == '__main__':
     # load dataset
     test_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'test_joints.csv'),
                                 transform=transforms.Compose([
-                                            Rescale((input_size, input_size)), # for resnet18
-                                            # Wrap((input_size,input_size)), # for mobilenet
+                                            # Rescale((input_size, input_size)), # for resnet18 and mobilenet
+                                            Wrap((input_size,input_size)), # only for mobilenet-best
                                             Expansion(),
                                             ToTensor()
                                         ]))

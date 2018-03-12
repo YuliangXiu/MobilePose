@@ -42,16 +42,10 @@ if __name__ == '__main__':
     image = crop_camera(image)
 
     while True:
-        fps_time = time.time()
         ret_val , image = cam.read()
         image = crop_camera(image)
         humans = e.inference(image, args.model)
         image = ResEstimator.draw_humans(image, humans, imgcopy=False)
-
-        cv2.putText(image,
-                    "FPS: %f" % (1.0 / (time.time() - fps_time)),
-                    (10, 10),  cv2.FONT_HERSHEY_SIMPLEX, 0.5,
-                    (0, 255, 0), 2)
         cv2.imshow('tf-pose-estimation result', image)
         if cv2.waitKey(1) == 27: # ESC
             break

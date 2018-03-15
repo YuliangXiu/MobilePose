@@ -28,7 +28,7 @@ from dataloader import crop_camera
 
 if __name__ == '__main__':
     
-    parser = argparse.ArgumentParser(description='deeppose realtime webcam')
+    parser = argparse.ArgumentParser(description='deeppose realtime webcam.')
     parser.add_argument('--model', type=str, default='resnet', help='mobilenet|resnet')
     parser.add_argument('--camera', type=int, default=0)
 

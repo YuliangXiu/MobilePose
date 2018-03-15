@@ -68,8 +68,8 @@ if __name__ == '__main__':
     if pretrain:
         net = torch.load('./models/%s/%s'%(modeltype,modelname)).cuda(device_id=gpus[0])
 
-    ROOT_DIR = "/home/yuliang/code/deeppose_tf/datasets/mpii"
-    PATH_PREFIX = '/home/yuliang/code/DeepPose-pytorch/models/{}/'.format(modeltype)
+    ROOT_DIR = "../deeppose_tf/datasets/mpii"
+    PATH_PREFIX = './models/{}/'.format(modeltype)
 
     train_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'train_joints.csv'),
                                     transform=transforms.Compose([

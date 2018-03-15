@@ -51,12 +51,13 @@ if __name__ == '__main__':
     filename = "final-aug.t7"
     num_threads = 10
 
-    PATH_PREFIX = "/home/yuliang/code/DeepPose-pytorch/results/{}".format(modeltype)
-    full_name="/home/yuliang/code/DeepPose-pytorch/models/{}/{}".format(modeltype, filename)
+    PATH_PREFIX = "./results/{}".format(modeltype)
+    full_name="./models/{}/{}".format(modeltype, filename)
     # full_name = "/home/yuliang/code/DeepPose-pytorch/models/demo/mobilenetv2_224x224-robust.t7"
     # full_name = "/home/yuliang/code/DeepPose-pytorch/models/demo/resnet18_227x227.t7"
-    full_name = "/home/yuliang/code/DeepPose-pytorch/models/demo/mobilenet-best.t7"
-    ROOT_DIR = "/home/yuliang/code/deeppose_tf/datasets/mpii"
+    # full_name = "/home/yuliang/code/DeepPose-pytorch/models/demo/mobilenet-best.t7"
+    # ROOT_DIR = "/home/yuliang/code/deeppose_tf/datasets/mpii"
+    ROOT_DIR = "../deeppose_tf/datasets/mpii"
     
     if modeltype == 'resnet':
         input_size = 227

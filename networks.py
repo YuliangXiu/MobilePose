@@ -1,6 +1,6 @@
 '''
 File: networks.py
-Project: DeepPose
+Project: MobilePose
 File Created: Thursday, 8th March 2018 2:59:28 pm
 Author: Yuliang Xiu (yuliangxiu@sjtu.edu.cn)
 -----

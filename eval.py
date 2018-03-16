@@ -1,7 +1,7 @@
 # coding: utf-8
 '''
 File: eval.py
-Project: DeepPose
+Project: MobilePose
 File Created: Thursday, 8th March 2018 1:54:07 pm
 Author: Yuliang Xiu (yuliangxiu@sjtu.edu.cn)
 -----
@@ -42,7 +42,7 @@ print(torch.cuda.device_count())
 
 if __name__ == '__main__':
     
-    parser = argparse.ArgumentParser(description='deeppose demo')
+    parser = argparse.ArgumentParser(description='MobilePose Demo')
     parser.add_argument('--model', type=str, default="resnet")
     args = parser.parse_args()
     modeltype = args.model
@@ -53,9 +53,9 @@ if __name__ == '__main__':
 
     PATH_PREFIX = "./results/{}".format(modeltype)
     full_name="./models/{}/{}".format(modeltype, filename)
-    # full_name = "/home/yuliang/code/DeepPose-pytorch/models/demo/mobilenetv2_224x224-robust.t7"
-    # full_name = "/home/yuliang/code/DeepPose-pytorch/models/demo/resnet18_227x227.t7"
-    # full_name = "/home/yuliang/code/DeepPose-pytorch/models/demo/mobilenet-best.t7"
+    # full_name = "/home/yuliang/code/MobilePose-pytorch/models/demo/mobilenetv2_224x224-robust.t7"
+    # full_name = "/home/yuliang/code/MobilePose-pytorch/models/demo/resnet18_227x227.t7"
+    # full_name = "/home/yuliang/code/MobilePose-pytorch/models/demo/mobilenet-best.t7"
     # ROOT_DIR = "/home/yuliang/code/deeppose_tf/datasets/mpii"
     ROOT_DIR = "../deeppose_tf/datasets/mpii"
     

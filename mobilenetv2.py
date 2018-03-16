@@ -1,6 +1,6 @@
 '''
 File: mobilenetv2.py
-Project: DeepPose
+Project: MobilePose
 File Created: Thursday, 8th March 2018 2:51:18 pm
 Author: Yuliang Xiu (yuliangxiu@sjtu.edu.cn)
 -----

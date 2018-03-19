@@ -1,6 +1,6 @@
 '''
 File: run_webcam.py
-Project: DeepPose
+Project: MobilePose
 File Created: Thursday, 8th March 2018 2:19:39 pm
 Author: Yuliang Xiu (yuliangxiu@sjtu.edu.cn)
 -----
@@ -28,7 +28,7 @@ from dataloader import crop_camera
 
 if __name__ == '__main__':
     
-    parser = argparse.ArgumentParser(description='deeppose realtime webcam.')
+    parser = argparse.ArgumentParser(description='MobilePose Realtime Webcam.')
     parser.add_argument('--model', type=str, default='resnet', help='mobilenet|resnet')
     parser.add_argument('--camera', type=int, default=0)
 

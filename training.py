@@ -2,7 +2,7 @@
 
 '''
 File: training.py
-Project: DeepPose
+Project: MobilePose
 File Created: Thursday, 8th March 2018 2:50:11 pm
 Author: Yuliang Xiu (yuliangxiu@sjtu.edu.cn)
 -----
@@ -29,7 +29,7 @@ from torch.utils.data import Dataset, DataLoader
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description='deeppose demo')
+    parser = argparse.ArgumentParser(description='MobilePose Demo')
     parser.add_argument('--model', type=str, default="resnet")
     parser.add_argument('--gpu', type=str, default="0")
     args = parser.parse_args()

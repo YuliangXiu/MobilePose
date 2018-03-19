@@ -1,6 +1,6 @@
 '''
 File: estimator.py
-Project: DeepPose
+Project: MobilePose
 File Created: Thursday, 8th March 2018 3:02:01 pm
 Author: Yuliang Xiu (yuliangxiu@sjtu.edu.cn)
 -----

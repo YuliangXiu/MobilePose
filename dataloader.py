@@ -1,6 +1,6 @@
 '''
 File: dataloader.py
-Project: DeepPose
+Project: MobilePose
 File Created: Thursday, 8th March 2018 3:00:27 pm
 Author: Yuliang Xiu (yuliangxiu@sjtu.edu.cn)
 -----

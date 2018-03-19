@@ -1,5 +1,8 @@
-# DeepPose-pytorch
-Reproduce Google's [DeepPose](https://arxiv.org/pdf/1312.4659.pdf) with Resnet18 by Pytorch
+# MobilePose
+
+MobilePose is a **Tiny** PyTorch implementation of single person 2D pose estimation framework. The aim is to provide the interface of the training/inference/evaluation, and the dataloader with various data augmentation options. And final trained model can satisfy basic requirements(speed+size+accuracy) for mobile device.
+
+Some codes for mobilenetV2 and display are brought from [pytorch-mobilenet-v2](https://github.com/tonylins/pytorch-mobilenet-v2) and [tf-pose-estimation](https://github.com/ildoonet/tf-pose-estimation). Thanks to the original authors.
 
 ## Functionality
 
@@ -8,16 +11,20 @@ Reproduce Google's [DeepPose](https://arxiv.org/pdf/1312.4659.pdf) with Resnet18
 3. **Accurate** keypoint estimation (75~85mAP(0.5IoU))
 
 ## Requirements:
+
 - Python 3.6.2
 - Pytorch 0.2.0\_3 
+- imgaug 0.2.5
 
 ## Todo List:
-- [x] accuracy(mAP) evaluation script
-- [x] multi-scales training
-- [x] data augmentation(rotate/shift/flip/multi-scale)
-- [x] support LSP dataset
-- [x] adding weighted loss(coco keypoints weight) 
-- [x] support Macbook camera realtime skeleton display demo
+
+- [x] multi-thread dataloader
+- [x] training and inference
+- [x] performance evaluation
+- [x] multi-scale training
+- [x] support resnet18/mobilenetV2
+- [x] data augmentation(rotate/shift/flip/multi-scale/noise)
+- [x] Macbook camera realtime display script
 
 ## Usage
 
@@ -27,10 +34,18 @@ export CUDA_VISIBLE_DEVICES=0; python training.py --model=mobilenet/resnet --gpu
 ```
 2. Evaluation
 ```shell
-python eval.py --model=mobilenet/resnet
+export CUDA_VISIBLE_DEVICES=0; python eval.py --model=mobilenet/resnet
 ```
 4. Realtime visualization:
 ```shell
 python run_webcam.py --model=mobilenet/resnet
 ```
+
+## Contributors
+
+MobilePose is developed and maintained by [Yuliang Xiu](http://xiuyuliang.cn/about/), [Zexin Chen](https://github.com/ZexinChen) and [Yinghong Fang](https://github.com/Fangyh09).
+
+## License
+
+MobilePose is freely available for free non-commercial use. For commercial queries, please contact [Cewu Lu](http://www.mvig.org/) or [SightPlus Co. Ltd](https://www.sightp.com/).
 

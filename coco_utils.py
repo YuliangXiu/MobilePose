@@ -1,6 +1,6 @@
 '''
 File: coco_utils.py
-Project: DeepPose
+Project: MobilePose
 File Created: Saturday, 3rd March 2018 7:04:57 pm
 Author: Yuliang Xiu (yuliangxiu@sjtu.edu.cn)
 -----

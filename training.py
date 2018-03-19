@@ -32,6 +32,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='MobilePose Demo')
     parser.add_argument('--model', type=str, default="resnet")
     parser.add_argument('--gpu', type=str, default="0")
+    parser.add_argument('--ROOT_DIR', type=str, default="../deeppose_tf/datasets/mpiis")
     args = parser.parse_args()
     modeltype = args.model
 
@@ -66,9 +67,11 @@ if __name__ == '__main__':
     logname = modeltype+'-log.txt'
 
     if pretrain:
+        # net = torch.load('./models/%s/%s'%(modeltype,modelname)).cuda()
         net = torch.load('./models/%s/%s'%(modeltype,modelname)).cuda(device_id=gpus[0])
 
-    ROOT_DIR = "../deeppose_tf/datasets/mpii"
+    # ROOT_DIR = "../deeppose_tf/datasets/mpii"
+    ROOT_DIR = args.ROOT_DIR
     PATH_PREFIX = './models/{}/'.format(modeltype)
 
     train_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'train_joints.csv'),

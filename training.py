@@ -75,8 +75,8 @@ if __name__ == '__main__':
     train_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'train_joints.csv'),
                                     transform=transforms.Compose([
                                                 # Augmentation(),
-                                                Rescale((inputsize,inputsize)),
-                                                # Wrap((inputsize,inputsize)),
+                                                Rescale((inputsize,inputsize)),# for resnet18 
+                                                # Wrap((inputsize,inputsize)),# for mobilenetv2
                                                 Expansion(),
                                                 ToTensor()
                                             ]))
@@ -85,8 +85,8 @@ if __name__ == '__main__':
 
     test_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'test_joints.csv'),
                                     transform=transforms.Compose([
-                                                Rescale((inputsize,inputsize)),
-                                                # Wrap((inputsize, inputsize)),
+                                                Rescale((inputsize,inputsize)),# for resnet18
+                                                # Wrap((inputsize, inputsize)),# for mobilenetv2
                                                 Expansion(),
                                                 ToTensor()
                                             ]))
@@ -109,6 +109,7 @@ if __name__ == '__main__':
         
         train_loss_epoch = []
         for i, data in enumerate(train_dataloader):
+            # training
             images, poses = data['image'], data['pose']
             images, poses = Variable(images.cuda()), Variable(poses.cuda())
             optimizer.zero_grad()

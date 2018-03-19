@@ -75,10 +75,10 @@ class MobileNetV2(nn.Module):
         ]
 
         # building first layer
+        # the input_size should be Multiples of 32
         assert input_size % 32 == 0
         input_channel = int(32 * width_mult)
         self.last_channel = int(1280 * width_mult) if width_mult > 1.0 else 1280
-#         self.last_channel = int(1280 * width_mult) if width_mult > 1.0 else 32
         self.features = [conv_bn(image_channel, input_channel, 2)]
         # building inverted residual blocks
         for t, c, n, s in self.interverted_residual_setting:
@@ -102,7 +102,6 @@ class MobileNetV2(nn.Module):
         )
 
         self._initialize_weights()
-#         print(width_mult)
 
     def forward(self, x):
         x = self.features(x)

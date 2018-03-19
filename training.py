@@ -66,6 +66,7 @@ if __name__ == '__main__':
     logname = modeltype+'-log.txt'
 
     if pretrain:
+        # load pretrain model
         # net = torch.load('./models/%s/%s'%(modeltype,modelname)).cuda()
         net = torch.load('./models/%s/%s'%(modeltype,modelname)).cuda(device_id=gpus[0])
 
@@ -123,7 +124,7 @@ if __name__ == '__main__':
         if epoch%2==0:
             valid_loss_epoch = []
             for i_batch, sample_batched in enumerate(test_dataloader):
-
+                # calculate the valid loss
                 net_forward = net
                 images = sample_batched['image'].cuda()
                 poses = sample_batched['pose'].cuda()
@@ -131,6 +132,7 @@ if __name__ == '__main__':
                 valid_loss_epoch.append(mse_loss(outputs.data,poses))
 
             if np.mean(np.array(valid_loss_epoch)) < minloss:
+                # save the model
                 minloss = np.mean(np.array(valid_loss_epoch))
                 checkpoint_file = PATH_PREFIX + modelname
                 torch.save(net, checkpoint_file)
@@ -138,6 +140,7 @@ if __name__ == '__main__':
 
             print('[epoch %d] train loss: %.8f, valid loss: %.8f' %
             (epoch + 1, np.mean(np.array(train_loss_epoch)), np.mean(np.array(valid_loss_epoch))))
+            # write the log of the training process
             with open(PATH_PREFIX+logname, 'a+') as file_output:
                 file_output.write('[epoch %d] train loss: %.8f, valid loss: %.8f\n' %
                 (epoch + 1, np.mean(np.array(train_loss_epoch)), np.mean(np.array(valid_loss_epoch))))

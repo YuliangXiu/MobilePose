@@ -15,6 +15,7 @@ import math
 
 
 def conv_bn(inp, oup, stride):
+    # convolution layer with batchnorm
     return nn.Sequential(
         nn.Conv2d(inp, oup, 3, stride, 1, bias=False),
         nn.BatchNorm2d(oup),
@@ -23,6 +24,7 @@ def conv_bn(inp, oup, stride):
 
 
 def conv_1x1_bn(inp, oup):
+    # 1x1 convolution layer with batchnorm
     return nn.Sequential(
         nn.Conv2d(inp, oup, 1, 1, 0, bias=False),
         nn.BatchNorm2d(oup),
@@ -74,8 +76,7 @@ class MobileNetV2(nn.Module):
             [6, 320, 1, 1],
         ]
 
-        # building first layer
-        # the input_size should be Multiples of 32
+        # building first layer, the input_size should be Multiples of 32
         assert input_size % 32 == 0
         input_channel = int(32 * width_mult)
         self.last_channel = int(1280 * width_mult) if width_mult > 1.0 else 1280

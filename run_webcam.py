@@ -34,16 +34,20 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    # load the model 
     w, h = model_wh(get_graph_path(args.model))
     e = ResEstimator(get_graph_path(args.model), target_size=(w,h))
+    # initial the camera
     cam = cv2.VideoCapture(args.camera)
 
     ret_val, image = cam.read()
     image = crop_camera(image)
 
     while True:
+        # read image from the camera and preprocess
         ret_val , image = cam.read()
         image = crop_camera(image)
+        # forward the image
         humans = e.inference(image, args.model)
         image = ResEstimator.draw_humans(image, humans, imgcopy=False)
         cv2.imshow('tf-pose-estimation result', image)

@@ -22,6 +22,7 @@ def get_graph_path(model_name):
     }[model_name]
 
 def model_wh(model_name):
+    # get the input image size from the model name
     width, height = model_name.split('_')[-1].split('x')
     return int(width), int(height.split(".")[0])
 
@@ -30,7 +31,9 @@ class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
         model = models.resnet18(pretrained=True)
+        # change the first layer to  recieve five channel image
         model.conv1 = nn.Conv2d(5, 64, kernel_size=7, stride=2, padding=3,bias=True)
+        # change the last layer to output 32 coordinates
         model.fc=nn.Linear(512,32)
         for param in model.parameters():
             param.requires_grad = True

@@ -53,27 +53,38 @@ if __name__ == '__main__':
 
     PATH_PREFIX = "./results/{}".format(modeltype)
     full_name="./models/{}/{}".format(modeltype, filename)
-    # full_name = "/home/yuliang/code/MobilePose-pytorch/models/demo/mobilenetv2_224x224-robust.t7"
-    # full_name = "/home/yuliang/code/MobilePose-pytorch/models/demo/resnet18_227x227.t7"
-    # full_name = "/home/yuliang/code/MobilePose-pytorch/models/demo/mobilenet-best.t7"
-    # ROOT_DIR = "/home/yuliang/code/deeppose_tf/datasets/mpii"
+    # full_name = "/home/yuliang/code/MobilePose-pytorch/models/demo/mobilenetv2_224x224-robust.t7" # Rescale Expansion ToTensor
+    # full_name = "/home/yuliang/code/MobilePose-pytorch/models/demo/mobilenetv2_224x224.t7" # Wrap Expansion ToTensor
+    full_name = "/home/yuliang/code/MobilePose-pytorch/models/demo/mobilenetv2_224x224-best.t7" # Wrap Expansion ToTensor
+    # full_name = "/home/yuliang/code/MobilePose-pytorch/models/demo/resnet18_227x227-robust.t7" # Rescale Expansion ToTensor
+    # full_name = "/home/yuliang/code/MobilePose-pytorch/models/demo/resnet18_227x227.t7" # Rescale Expansion ToTensor
+
     ROOT_DIR = "../deeppose_tf/datasets/mpii"
     
     if modeltype == 'resnet':
+        full_name = "/home/yuliang/code/MobilePose-pytorch/models/demo/resnet18_227x227-robust.t7" # Rescale Expansion ToTensor
         input_size = 227
+        test_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'test_joints.csv'),
+                                    transform=transforms.Compose([
+                                                Rescale((input_size, input_size)), # resnet use
+                                                # Wrap((input_size,input_size)), # mobilenet use
+                                                Expansion(),
+                                                ToTensor()
+                                            ]))
+
     elif modeltype == 'mobilenet':
+        full_name = "/home/yuliang/code/MobilePose-pytorch/models/demo/mobilenetv2_224x224-best.t7" # Wrap Expansion ToTensor
         input_size = 224
+        test_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'test_joints.csv'),
+                                    transform=transforms.Compose([
+                                                # Rescale((input_size, input_size)), # resnet use
+                                                Wrap((input_size,input_size)), # mobilenet use
+                                                Expansion(),
+                                                ToTensor()
+                                            ]))
 
     print("Loading testing dataset, wait...")
 
-    # load dataset
-    test_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'test_joints.csv'),
-                                transform=transforms.Compose([
-                                            # Rescale((input_size, input_size)), # for resnet18 and mobilenet
-                                            Wrap((input_size,input_size)), # only for mobilenet-best
-                                            Expansion(),
-                                            ToTensor()
-                                        ]))
     test_dataset_size = len(test_dataset)
 
     test_dataloader = DataLoader(test_dataset, batch_size=test_dataset_size,
@@ -124,9 +135,9 @@ if __name__ == '__main__':
             # sample_data['image'] = all_test_data['image'][100 * (i - 1) : min(100 * i, total_size)]
 
             # print('test dataset contains: %d'%(len(sample_data['image'])))
-            # t0 = time.time()
+            t0 = time.time()
             output = net(Variable(sample_data['image'],volatile=True))
-            # print('FPS is %f'%(1.0/((time.time()-t0)/len(sample_data['image']))))
+            print('FPS is %f'%(1.0/((time.time()-t0)/len(sample_data['image']))))
 
             transform_to_coco_pred(output, all_coco_pred_annotations_arr, 100 * (i - 1))
 

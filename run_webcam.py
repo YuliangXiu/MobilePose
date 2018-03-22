@@ -50,7 +50,7 @@ if __name__ == '__main__':
         # forward the image
         humans = e.inference(image, args.model)
         image = ResEstimator.draw_humans(image, humans, imgcopy=False)
-        cv2.imshow('tf-pose-estimation result', image)
+        cv2.imshow('MobilePose Demo', image)
         if cv2.waitKey(1) == 27: # ESC
             break
 

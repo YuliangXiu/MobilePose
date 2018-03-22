@@ -8,11 +8,11 @@ Some codes for mobilenetV2 and display are brought from [pytorch-mobilenet-v2](h
 
 1. **Tiny** trained model (Resnet18[43MB], MobilenetV2[8.9MB])
 2. **Fast** inference speed (GPU>100FPS, CPU~30FPS)
-3. **Accurate** keypoint estimation (75~85mAP(0.5IoU))
+3. **Accurate** keypoint estimation (75~85mAP(0.5IoU), 33~40mAP(0.5~0.95IoU))
 
 ## Requirements:
 
-- Python 3.6.2
+- Python 2.7.13
 - Pytorch 0.2.0\_3 
 - imgaug 0.2.5
 
@@ -34,6 +34,7 @@ export CUDA_VISIBLE_DEVICES=0; python training.py --model=mobilenet/resnet --gpu
 ```
 2. Evaluation
 ```shell
+ln -s cocoapi/PythonAPI/pycocotools
 export CUDA_VISIBLE_DEVICES=0; python eval.py --model=mobilenet/resnet
 ```
 4. Realtime visualization:

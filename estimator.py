@@ -28,7 +28,7 @@ class ResEstimator:
     def __init__(self, graph_path, target_size=(224, 224)):
         self.target_size = target_size
         self.graph_path = graph_path
-        self.net = torch.load(graph_path,map_location=lambda storage, loc: storage)
+        self.net = torch.load(graph_path, map_location=lambda storage, loc: storage)
         self.net.eval()
 
     def addlayer(self, image):
@@ -43,7 +43,7 @@ class ResEstimator:
         return image
 
     def wrap(self, image, output_size):
-        image_ = image
+        image_ = image/256.0
         h, w = image_.shape[:2]
         if isinstance(output_size, int):
             if h > w:
@@ -60,7 +60,7 @@ class ResEstimator:
         return {'image': image, 'pose_fun': pose_fun}
         
     def rescale(self, image, output_size):
-        image_ = image
+        image_ = image/256.0
         h, w = image_.shape[:2]
         im_scale = min(float(output_size[0]) / float(h), float(output_size[1]) / float(w))
         new_h = int(image_.shape[0] * im_scale)
@@ -89,12 +89,12 @@ class ResEstimator:
         height = canvas.shape[0]
         width = canvas.shape[1]
 
-        if model == 'resnet':
+        if 'resnet' in model:
             rescale_out = self.rescale(in_npimg, (227,227))
-        elif model =='mobilenet':
-            rescale_out = self.rescale(in_npimg, (224,224))
+        elif 'mobilenet' in model:
+            rescale_out = self.wrap(in_npimg, (224,224))
         
-        image = rescale_out['image']/256.0
+        image = rescale_out['image']
         image = self.addlayer(image)
         image = self.to_tensor(image)
         image = image.unsqueeze(0)

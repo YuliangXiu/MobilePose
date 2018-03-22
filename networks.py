@@ -23,8 +23,11 @@ def get_graph_path(model_name):
 
 def model_wh(model_name):
     # get the input image size from the model name
-    width, height = model_name.split('_')[-1].split('x')
-    return int(width), int(height.split(".")[0])
+    if 'resnet' in model_name.split('_')[0]:
+        width, height = 227, 227
+    else:
+        width, height = 224, 224 
+    return int(width), int(height)
 
 class Net(nn.Module):
     

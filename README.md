@@ -8,7 +8,7 @@ Some codes for mobilenetV2 and display are brought from [pytorch-mobilenet-v2](h
 
 1. **Tiny** trained model (Resnet18[43MB], MobilenetV2[8.9MB])
 2. **Fast** inference speed (GPU>100FPS, CPU~30FPS)
-3. **Accurate** keypoint estimation (75~85mAP(0.5IoU), 33~40mAP(0.5~0.95IoU))
+3. **Accurate** keypoint estimation (75-85mAP(0.5IoU), 33-40mAP(0.5~0.95IoU))
 
 ## Requirements:
 

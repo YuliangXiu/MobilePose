@@ -63,12 +63,15 @@ if __name__ == '__main__':
     gpus = [0,1]
     print("GPU NUM: %d"%(torch.cuda.device_count()))
 
+
     logname = modeltype+'-log.txt'
 
     if pretrain:
         # load pretrain model
         # net = torch.load('./models/%s/%s'%(modeltype,modelname)).cuda()
         net = torch.load('./models/%s/%s'%(modeltype,modelname)).cuda(device_id=gpus[0])
+
+    net = net.train()
 
     ROOT_DIR = "../deeppose_tf/datasets/mpii" # root dir to the dataset
     PATH_PREFIX = './models/{}/'.format(modeltype) # path to save the model

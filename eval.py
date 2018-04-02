@@ -55,14 +55,14 @@ if __name__ == '__main__':
     full_name="./models/{}/{}".format(modeltype, filename)
     # full_name = "/home/yuliang/code/MobilePose-pytorch/models/demo/mobilenetv2_224x224-robust.t7" # Rescale Expansion ToTensor
     # full_name = "/home/yuliang/code/MobilePose-pytorch/models/demo/mobilenetv2_224x224.t7" # Wrap Expansion ToTensor
-    full_name = "/home/yuliang/code/MobilePose-pytorch/models/demo/mobilenetv2_224x224-best.t7" # Wrap Expansion ToTensor
+    # full_name = "/home/yuliang/code/MobilePose-pytorch/models/demo/mobilenetv2_224x224-best.t7" # Wrap Expansion ToTensor
     # full_name = "/home/yuliang/code/MobilePose-pytorch/models/demo/resnet18_227x227-robust.t7" # Rescale Expansion ToTensor
     # full_name = "/home/yuliang/code/MobilePose-pytorch/models/demo/resnet18_227x227.t7" # Rescale Expansion ToTensor
 
     ROOT_DIR = "../deeppose_tf/datasets/mpii"
     
     if modeltype == 'resnet':
-        full_name = "/home/yuliang/code/MobilePose-pytorch/models/demo/resnet18_227x227-robust.t7" # Rescale Expansion ToTensor
+        full_name = "/home/yuliang/code/MobilePose-pytorch/models/demo/resnet18_227x227.t7" # Rescale Expansion ToTensor
         input_size = 227
         test_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'test_joints.csv'),
                                     transform=transforms.Compose([
@@ -73,12 +73,12 @@ if __name__ == '__main__':
                                             ]))
 
     elif modeltype == 'mobilenet':
-        full_name = "/home/yuliang/code/MobilePose-pytorch/models/demo/mobilenetv2_224x224-best.t7" # Wrap Expansion ToTensor
+        full_name = "/home/yuliang/code/MobilePose-pytorch/models/demo/mobilenetv2_224x224-robust.t7" # Wrap Expansion ToTensor
         input_size = 224
         test_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'test_joints.csv'),
                                     transform=transforms.Compose([
-                                                # Rescale((input_size, input_size)), # resnet use
-                                                Wrap((input_size,input_size)), # mobilenet use
+                                                Rescale((input_size, input_size)), # resnet use
+                                                # Wrap((input_size,input_size)), # mobilenet use
                                                 Expansion(),
                                                 ToTensor()
                                             ]))
@@ -104,6 +104,7 @@ if __name__ == '__main__':
         # gpu mode
         net = Net().cuda(device_id=gpus[0])
         net = torch.load(net_path).cuda(device_id=gpus[0])
+        net.eval()
 
         # cpu mode
         # net = Net()
@@ -126,20 +127,22 @@ if __name__ == '__main__':
         # generate predictioin json
         total_size = len(all_test_data['image'])
         all_coco_pred_annotations_arr = [] 
-        for i in tqdm(range(1, int(ceil(total_size / 100.0 + 1)))):
+        
+        bs = 1 # batchsize
+
+        for i in tqdm(range(1, int(ceil(total_size / float(bs) + 1)))):
             sample_data = {}
 
             # gpu mode
-            sample_data['image'] = all_test_data['image'][100 * (i - 1) : min(100 * i, total_size)].cuda(device=gpus[0])
+            sample_data['image'] = all_test_data['image'][bs * (i - 1) : min(bs * i, total_size)].cuda(device=gpus[0])
             # cpu mode
             # sample_data['image'] = all_test_data['image'][100 * (i - 1) : min(100 * i, total_size)]
 
-            # print('test dataset contains: %d'%(len(sample_data['image'])))
-            t0 = time.time()
+            # t0 = time.time()
             output = net(Variable(sample_data['image'],volatile=True))
-            print('FPS is %f'%(1.0/((time.time()-t0)/len(sample_data['image']))))
+            # print('FPS is %f'%(1.0/((time.time()-t0)/len(sample_data['image']))))
 
-            transform_to_coco_pred(output, all_coco_pred_annotations_arr, 100 * (i - 1))
+            transform_to_coco_pred(output, all_coco_pred_annotations_arr, bs * (i - 1))
 
         all_coco_pred_annotations_arr = [item._asdict() for item in all_coco_pred_annotations_arr]
         result_pred_json = json.dumps(all_coco_pred_annotations_arr, cls=MyEncoder)

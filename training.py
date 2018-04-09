@@ -32,6 +32,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='MobilePose Demo')
     parser.add_argument('--model', type=str, default="resnet")
     parser.add_argument('--gpu', type=str, default="0")
+    parser.add_argument('--retrain', type=bool, default=True)
     args = parser.parse_args()
     modeltype = args.model
 
@@ -40,7 +41,6 @@ if __name__ == '__main__':
 
     if modeltype =='resnet':
         modelname = "final-aug.t7"
-        pretrain = True
         batchsize = 256
         minloss = 316.52189376 #changed expand ratio
         # minloss = 272.49565467 #fixed expand ratio
@@ -49,7 +49,6 @@ if __name__ == '__main__':
         inputsize = 227
     elif modeltype == "mobilenet":
         modelname = "final-aug.t7"
-        pretrain = True
         batchsize = 128
         minloss = 396.84708708 # change expand ratio
         # minloss = 332.48316225 # fixed expand ratio
@@ -66,7 +65,7 @@ if __name__ == '__main__':
 
     logname = modeltype+'-log.txt'
 
-    if pretrain:
+    if not args.retrain:
         # load pretrain model
         # net = torch.load('./models/%s/%s'%(modeltype,modelname)).cuda()
         net = torch.load('./models/%s/%s'%(modeltype,modelname)).cuda(device_id=gpus[0])
@@ -78,7 +77,7 @@ if __name__ == '__main__':
 
     train_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'train_joints.csv'),
                                     transform=transforms.Compose([
-                                                # Augmentation(),
+                                                Augmentation(),
                                                 Rescale((inputsize,inputsize)),# for resnet18 
                                                 # Wrap((inputsize,inputsize)),# for mobilenetv2
                                                 Expansion(),

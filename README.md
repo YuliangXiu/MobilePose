@@ -48,5 +48,5 @@ MobilePose is developed and maintained by [Yuliang Xiu](http://xiuyuliang.cn/abo
 
 ## License
 
-MobilePose is freely available for free non-commercial use. For commercial queries, please contact [Cewu Lu](http://www.mvig.org/) or [SightPlus Co. Ltd](https://www.sightp.com/).
+MobilePose is freely available for free non-commercial use. For commercial queries, please contact [Cewu Lu](http://www.mvig.org/).
 

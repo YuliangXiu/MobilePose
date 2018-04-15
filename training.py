@@ -16,8 +16,7 @@ Copyright 2018 - 2018 Shanghai Jiao Tong University, Machine Vision and Intellig
 import warnings
 warnings.filterwarnings('ignore')
 
-import os
-import numpy as np
+
 from networks import *
 from dataloader import *
 import argparse
@@ -25,7 +24,8 @@ import argparse
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import DataLoader
+from dataset_factory import DatasetFactory
 
 if __name__ == '__main__':
 
@@ -46,7 +46,7 @@ if __name__ == '__main__':
         # minloss = 272.49565467 #fixed expand ratio
         learning_rate = 1e-05
         net = Net().cuda()
-        inputsize = 227
+        inputsize = 224
     elif modeltype == "mobilenet":
         modelname = "final-aug.t7"
         batchsize = 128
@@ -75,24 +75,27 @@ if __name__ == '__main__':
     ROOT_DIR = "../deeppose_tf/datasets/mpii" # root dir to the dataset
     PATH_PREFIX = './models/{}/'.format(modeltype) # path to save the model
 
-    train_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'train_joints.csv'),
-                                    transform=transforms.Compose([
-                                                Augmentation(),
-                                                Rescale((inputsize,inputsize)),# for resnet18 
-                                                # Wrap((inputsize,inputsize)),# for mobilenetv2
-                                                Expansion(),
-                                                ToTensor()
-                                            ]))
+    # train_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'train_joints.csv'),
+    #                                 transform=transforms.Compose([
+    #                                             Augmentation(),
+    #                                             Rescale((inputsize,inputsize)),# for resnet18
+    #                                             # Wrap((inputsize,inputsize)),# for mobilenetv2
+    #                                             Expansion(),
+    #                                             ToTensor()
+    #                                         ]))
+    train_dataset = DatasetFactory.get_train_dataset(modeltype, inputsize)
+
     train_dataloader = DataLoader(train_dataset, batch_size=batchsize,
                             shuffle=False, num_workers = num_threads)
 
-    test_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'test_joints.csv'),
-                                    transform=transforms.Compose([
-                                                Rescale((inputsize,inputsize)),# for resnet18
-                                                # Wrap((inputsize, inputsize)),# for mobilenetv2
-                                                Expansion(),
-                                                ToTensor()
-                                            ]))
+    # test_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'test_joints.csv'),
+    #                                 transform=transforms.Compose([
+    #                                             Rescale((inputsize,inputsize)),# for resnet18
+    #                                             # Wrap((inputsize, inputsize)),# for mobilenetv2
+    #                                             Expansion(),
+    #                                             ToTensor()
+    #                                         ]))
+    test_dataset = DatasetFactory.get_test_dataset(modeltype, inputsize)
     test_dataloader = DataLoader(test_dataset, batch_size=batchsize,
                             shuffle=False, num_workers = num_threads)
 

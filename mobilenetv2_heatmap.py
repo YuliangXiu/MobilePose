@@ -116,7 +116,7 @@ class Hourglass2(nn.Module):
 
 
 class HeatmapMobileNetV2(nn.Module):
-    def __init__(self, image_channel=3, n_class=32, input_size=224, width_mult=1.):
+    def __init__(self, image_channel=5, n_class=32, input_size=224, width_mult=1.):
         super(HeatmapMobileNetV2, self).__init__()
         # begin heatmap-mobilenetV2
         self.features = [mix_conv(image_channel)]
@@ -131,10 +131,10 @@ class HeatmapMobileNetV2(nn.Module):
         self.interverted_residual_setting = [
             # t, c, n, s
             [1, 16, 1, 1],
-            [1, 32, 1, 1],
-            [1, 32, 2, 1],
-            [1, 64, 2, 1],
-            [1, 96, 2, 1],
+            [2, 32, 2, 1],
+            [2, 32, 3, 1],
+            [2, 64, 2, 1],
+            [2, 96, 2, 1],
         ]
 
         input_channel = 16
@@ -153,7 +153,7 @@ class HeatmapMobileNetV2(nn.Module):
 
         self.features.append(conv_dw(128, 128, 1))
         self.features.append(conv_dw(128, 64, 1))
-        self.features.append(nn.Conv2d(64, 1, 1, 1))
+        self.features.append(nn.Conv2d(64, 16, 1, 1))
         self.features = nn.Sequential(*self.features)
 
         self._initialize_weights()
@@ -189,13 +189,13 @@ def count_para(parameters):
     return total_size * 4 * 1.0 / 1024 / 1024
 
 
-image = np.random.rand(10, 3, 224, 224)
-image = torch.from_numpy(image).float()
-# print(image.shape)
-net = HeatmapMobileNetV2()
-
-print("para size is", count_para(net.parameters()))
-out = net(Variable(image))
-print(out.size())
+# image = np.random.rand(10, 5, 224, 224)
+# image = torch.from_numpy(image).float()
+# # print(image.shape)
+# net = HeatmapMobileNetV2()
+#
+# print("para size is", count_para(net.parameters()))
+# out = net(Variable(image))
+# print(out.size())
 
 

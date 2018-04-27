@@ -42,7 +42,7 @@ class DatasetFactory:
                                # # Wrap((inputsize,inputsize)),# for mobilenetv2
                                get_transform(modeltype, input_size),
                                Expansion(),
-                               Guass(),
+                               # Guass(),
                                ToTensor()
                            ]))
 
@@ -65,6 +65,6 @@ class DatasetFactory:
                 # # Wrap((inputsize, inputsize)),# for mobilenetv2
                 get_transform(modeltype, input_size),
                 Expansion(),
-                Guass(),
+                # Guass(),
                 ToTensor()
             ]))

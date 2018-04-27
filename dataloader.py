@@ -25,6 +25,8 @@ import torch.backends.cudnn as cudnn
 from torch.utils.data import Dataset, DataLoader
 from torchvision import datasets, transforms, utils, models
 from torch.autograd import Variable
+import matplotlib
+matplotlib.use('Agg')
 
 # import matplotlib.pyplot as plt
 

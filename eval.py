@@ -128,7 +128,7 @@ if __name__ == '__main__':
         total_size = len(all_test_data['image'])
         all_coco_pred_annotations_arr = [] 
         
-        bs = 1 # batchsize
+        bs = 100 # batchsize
 
         for i in tqdm(range(1, int(ceil(total_size / float(bs) + 1)))):
             sample_data = {}

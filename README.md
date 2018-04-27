@@ -10,13 +10,13 @@ Some codes for mobilenetV2 and display are brought from [pytorch-mobilenet-v2](h
 2. **Fast** inference speed (GPU>100FPS, CPU~30FPS)
 3. **Accurate** keypoint estimation (75-85mAP(0.5IoU), 33-40mAP(0.5~0.95IoU))
 
-## Requirements:
+## Requirements
 
 - Python 2.7.13
 - Pytorch 0.2.0\_3 
 - imgaug 0.2.5
 
-## Todo List:
+## Todo List
 
 - [x] multi-thread dataloader
 - [x] training and inference
@@ -25,6 +25,10 @@ Some codes for mobilenetV2 and display are brought from [pytorch-mobilenet-v2](h
 - [x] support resnet18/mobilenetV2
 - [x] data augmentation(rotate/shift/flip/multi-scale/noise)
 - [x] Macbook camera realtime display script
+
+## Pretrained Model
+
+[Resnet18+MobilenetV2](https://pan.baidu.com/s/17V6fXWLZaZN7D9h8OkwyMg)
 
 ## Usage
 

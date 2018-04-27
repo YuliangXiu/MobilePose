@@ -46,7 +46,7 @@ if __name__ == '__main__':
         # minloss = 272.49565467 #fixed expand ratio
         learning_rate = 1e-05
         net = Net().cuda()
-        inputsize = 227
+        inputsize = 224
     elif modeltype == "mobilenet":
         modelname = "final-aug.t7"
         batchsize = 128

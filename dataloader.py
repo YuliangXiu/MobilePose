@@ -17,6 +17,7 @@ from skimage import io, transform
 import cv2
 
 import torch
+import alog
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
@@ -125,6 +126,7 @@ class ToTensor(object):
 
     def __call__(self, sample):
         image, pose = sample['image'], sample['pose']
+        guass_heatmap = sample['guass_heatmap']
         h, w = image.shape[:2]
 
         x_mean = np.mean(image[:,:,3])
@@ -141,9 +143,11 @@ class ToTensor(object):
         image = (image-mean)/(std)
         image = torch.from_numpy(image.transpose((2, 0, 1))).float()
         pose = torch.from_numpy(pose).float()
+        guass_heatmap = torch.from_numpy(guass_heatmap).float()
         
         return {'image': image,
-                'pose': pose}
+                'pose': pose,
+                'guass_heatmap': guass_heatmap}
 
 class PoseDataset(Dataset):
 
@@ -220,3 +224,32 @@ class Augmentation(object):
         keypoints_aug = seq_det.augment_keypoints([self.pose2keypoints(image,pose)])[0]
 
         return {'image': image_aug, 'pose': self.keypoints2pose(keypoints_aug)}
+
+# TBD
+class OneHot(object):
+    def __call__(self, sample):
+        image, pose = sample['image'], sample['pose']
+        one_hot = torch.zeros_like(torch.from_numpy(image))
+        return {'image': image, 'pose': pose}
+
+
+class Guass(object):
+    def __call__(self, sample):
+        sigma = 5
+        image, pose = sample['image'], sample['pose']
+        # create meshgrid
+        h, w = image.shape[:2]
+        x = np.arange(0, h)
+        y = np.arange(0, w)
+        x, y = np.meshgrid(x, y)
+        # declare guass
+        guass_heatmap = np.zeros([len(pose) // 2, image.shape[0], image.shape[1]])
+        xy_pose = np.reshape(pose,(-1, 2))
+        guass_hrescale = h // 30
+        guass_wrescale = w // 30
+
+        for idx,(x0,y0) in enumerate(xy_pose):
+            # alog.info(idx)
+            guass_heatmap[idx] = np.exp(- (((x - x0) * 1.0 /  guass_hrescale) ** 2 + ((y - y0) * 1.0 / guass_wrescale) ** 2) / (2 * sigma ** 2))
+        # alog.info(guass_heatmap.shape)
+        return {'image': image, 'pose': pose, 'guass_heatmap': guass_heatmap}

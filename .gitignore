@@ -3,6 +3,7 @@
 *.t7
 *.jpg
 *.txt
+!requirements.txt
 *.pyc
 models
 __pycache__
@@ -10,3 +11,4 @@ others
 .vscode
 .gitignore
 .pycocotools
+.idea

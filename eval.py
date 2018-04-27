@@ -14,26 +14,17 @@ Copyright 2018 - 2018 Shanghai Jiao Tong University, Machine Vision and Intellig
 import warnings
 warnings.filterwarnings('ignore')
 
-import torch.nn as nn
-import torch.optim as optim
-from torch.autograd import Variable
-from torch.utils.data import Dataset, DataLoader
-from torchvision import datasets, transforms, utils, models
 from tqdm import tqdm
-from skimage import io, transform
 from math import ceil
-import numpy as np
-import torch
-import csv
-import os
+
 import argparse
-import time
 
 from dataloader import *
 from coco_utils import *
 from networks import *
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
+from dataset_factory import DatasetFactory
 
 gpus = [0,1]
 os.environ["CUDA_VISIBLE_DEVICES"]="0"
@@ -64,24 +55,26 @@ if __name__ == '__main__':
     if modeltype == 'resnet':
         full_name = "/home/yuliang/code/MobilePose-pytorch/models/demo/resnet18_227x227.t7" # Rescale Expansion ToTensor
         input_size = 227
-        test_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'test_joints.csv'),
-                                    transform=transforms.Compose([
-                                                Rescale((input_size, input_size)), # resnet use
-                                                # Wrap((input_size,input_size)), # mobilenet use
-                                                Expansion(),
-                                                ToTensor()
-                                            ]))
+        # test_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'test_joints.csv'),
+        #                             transform=transforms.Compose([
+        #                                         Rescale((input_size, input_size)), # resnet use
+        #                                         # Wrap((input_size,input_size)), # mobilenet use
+        #                                         Expansion(),
+        #                                         ToTensor()
+        #                                     ]))
+        test_dataset = DatasetFactory.get_test_dataset(modeltype, input_size)
 
     elif modeltype == 'mobilenet':
         full_name = "/home/yuliang/code/MobilePose-pytorch/models/demo/mobilenetv2_224x224-robust.t7" # Wrap Expansion ToTensor
         input_size = 224
-        test_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'test_joints.csv'),
-                                    transform=transforms.Compose([
-                                                Rescale((input_size, input_size)), # resnet use
-                                                # Wrap((input_size,input_size)), # mobilenet use
-                                                Expansion(),
-                                                ToTensor()
-                                            ]))
+        # test_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'test_joints.csv'),
+        #                             transform=transforms.Compose([
+        #                                         Rescale((input_size, input_size)), # resnet use
+        #                                         # Wrap((input_size,input_size)), # mobilenet use
+        #                                         Expansion(),
+        #                                         ToTensor()
+        #                                     ]))
+        test_dataset = DatasetFactory.get_test_dataset(modeltype, input_size)
 
     print("Loading testing dataset, wait...")
 

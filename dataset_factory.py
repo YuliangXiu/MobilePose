@@ -2,7 +2,7 @@ from dataloader import *
 
 ROOT_DIR = "../deeppose_tf/datasets/mpii"  # root dir to the dataset
 
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 def get_transform(modeltype, input_size):
     """
@@ -42,7 +42,7 @@ class DatasetFactory:
                                # # Wrap((inputsize,inputsize)),# for mobilenetv2
                                get_transform(modeltype, input_size),
                                Expansion(),
-                               Guass(),
+                               # Guass(),
                                ToTensor()
                            ]))
 
@@ -65,6 +65,6 @@ class DatasetFactory:
                 # # Wrap((inputsize, inputsize)),# for mobilenetv2
                 get_transform(modeltype, input_size),
                 Expansion(),
-                Guass(),
+                # Guass(),
                 ToTensor()
             ]))

@@ -2,7 +2,7 @@ from dataloader import *
 
 ROOT_DIR = "../deeppose_tf/datasets/mpii"  # root dir to the dataset
 
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 def get_transform(modeltype, input_size):
     """

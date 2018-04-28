@@ -39,6 +39,7 @@ export CUDA_VISIBLE_DEVICES=0; python training.py --model=mobilenet/resnet --gpu
 2. Evaluation
 ```shell
 ln -s cocoapi/PythonAPI/pycocotools
+cd cocoapi/PythonAPI && make
 export CUDA_VISIBLE_DEVICES=0; python eval.py --model=mobilenet/resnet
 ```
 4. Realtime visualization:

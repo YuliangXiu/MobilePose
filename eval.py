@@ -19,6 +19,7 @@ from math import ceil
 
 import argparse
 
+import os
 from dataloader import *
 from coco_utils import *
 from networks import *
@@ -55,25 +56,13 @@ if __name__ == '__main__':
     if modeltype == 'resnet':
         full_name = "/home/yuliang/code/MobilePose-pytorch/models/demo/resnet18_227x227.t7" # Rescale Expansion ToTensor
         input_size = 227
-        # test_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'test_joints.csv'),
-        #                             transform=transforms.Compose([
-        #                                         Rescale((input_size, input_size)), # resnet use
-        #                                         # Wrap((input_size,input_size)), # mobilenet use
-        #                                         Expansion(),
-        #                                         ToTensor()
-        #                                     ]))
+      
         test_dataset = DatasetFactory.get_test_dataset(modeltype, input_size)
 
     elif modeltype == 'mobilenet':
         full_name = "/home/yuliang/code/MobilePose-pytorch/models/demo/mobilenetv2_224x224-robust.t7" # Wrap Expansion ToTensor
         input_size = 224
-        # test_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'test_joints.csv'),
-        #                             transform=transforms.Compose([
-        #                                         Rescale((input_size, input_size)), # resnet use
-        #                                         # Wrap((input_size,input_size)), # mobilenet use
-        #                                         Expansion(),
-        #                                         ToTensor()
-        #                                     ]))
+ 
         test_dataset = DatasetFactory.get_test_dataset(modeltype, input_size)
 
     print("Loading testing dataset, wait...")
@@ -95,8 +84,8 @@ if __name__ == '__main__':
         'result-gt-json.txt', 'result-pred-json.txt')
         """
         # gpu mode
-        net = Net().cuda(device_id=gpus[0])
-        net = torch.load(net_path).cuda(device_id=gpus[0])
+        net = Net().cuda()
+        net = torch.load(net_path).cuda()
         net.eval()
 
         # cpu mode
@@ -113,7 +102,11 @@ if __name__ == '__main__':
         result_gt_json = float2int(coco_str)
 
         # save ground truth json to file
+        dirname = os.path.dirname(result_gt_json_path)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
         f = open(result_gt_json_path, "w")
+        print("==> write" + result_gt_json_path)
         f.write(result_gt_json)
         f.close()
 
@@ -127,7 +120,7 @@ if __name__ == '__main__':
             sample_data = {}
 
             # gpu mode
-            sample_data['image'] = all_test_data['image'][bs * (i - 1) : min(bs * i, total_size)].cuda(device=gpus[0])
+            sample_data['image'] = all_test_data['image'][bs * (i - 1) : min(bs * i, total_size)].cuda()
             # cpu mode
             # sample_data['image'] = all_test_data['image'][100 * (i - 1) : min(100 * i, total_size)]
 
@@ -142,7 +135,11 @@ if __name__ == '__main__':
         result_pred_json = float2int(result_pred_json)
 
         # save result predict json to file
+        dirname = os.path.dirname(result_pred_json_path)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
         f = open(result_pred_json_path, "w")
+        print("==> save " + result_pred_json_path)
         f.write(result_pred_json)
         f.close()
 

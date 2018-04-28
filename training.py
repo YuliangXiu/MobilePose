@@ -26,6 +26,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from dataset_factory import DatasetFactory
+import os
 
 if __name__ == '__main__':
 
@@ -75,26 +76,12 @@ if __name__ == '__main__':
     ROOT_DIR = "../deeppose_tf/datasets/mpii" # root dir to the dataset
     PATH_PREFIX = './models/{}/'.format(modeltype) # path to save the model
 
-    # train_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'train_joints.csv'),
-    #                                 transform=transforms.Compose([
-    #                                             Augmentation(),
-    #                                             Rescale((inputsize,inputsize)),# for resnet18
-    #                                             # Wrap((inputsize,inputsize)),# for mobilenetv2
-    #                                             Expansion(),
-    #                                             ToTensor()
-    #                                         ]))
     train_dataset = DatasetFactory.get_train_dataset(modeltype, inputsize)
 
     train_dataloader = DataLoader(train_dataset, batch_size=batchsize,
                             shuffle=False, num_workers = num_threads)
 
-    # test_dataset = PoseDataset(csv_file=os.path.join(ROOT_DIR,'test_joints.csv'),
-    #                                 transform=transforms.Compose([
-    #                                             Rescale((inputsize,inputsize)),# for resnet18
-    #                                             # Wrap((inputsize, inputsize)),# for mobilenetv2
-    #                                             Expansion(),
-    #                                             ToTensor()
-    #                                         ]))
+
     test_dataset = DatasetFactory.get_test_dataset(modeltype, inputsize)
     test_dataloader = DataLoader(test_dataset, batch_size=batchsize,
                             shuffle=False, num_workers = num_threads)
@@ -146,6 +133,8 @@ if __name__ == '__main__':
             print('[epoch %d] train loss: %.8f, valid loss: %.8f' %
             (epoch + 1, np.mean(np.array(train_loss_epoch)), np.mean(np.array(valid_loss_epoch))))
             # write the log of the training process
+            if not os.path.exists(PATH_PREFIX):
+                os.makedirs(PATH_PREFIX)
             with open(PATH_PREFIX+logname, 'a+') as file_output:
                 file_output.write('[epoch %d] train loss: %.8f, valid loss: %.8f\n' %
                 (epoch + 1, np.mean(np.array(train_loss_epoch)), np.mean(np.array(valid_loss_epoch))))

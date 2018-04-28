@@ -128,7 +128,8 @@ class ToTensor(object):
 
     def __call__(self, sample):
         image, pose = sample['image'], sample['pose']
-        guass_heatmap = sample['guass_heatmap']
+		# todo: support heatmap
+        # guass_heatmap = sample['guass_heatmap']
         h, w = image.shape[:2]
 
         x_mean = np.mean(image[:,:,3])
@@ -145,11 +146,13 @@ class ToTensor(object):
         image = (image-mean)/(std)
         image = torch.from_numpy(image.transpose((2, 0, 1))).float()
         pose = torch.from_numpy(pose).float()
-        guass_heatmap = torch.from_numpy(guass_heatmap).float()
-        
+		# todo: support heatmap
+	    # guass_heatmap = torch.from_numpy(guass_heatmap).float()
         return {'image': image,
-                'pose': pose,
-                'guass_heatmap': guass_heatmap}
+                'pose': pose}
+        #return {'image': image,
+        #        'pose': pose,
+        #        'guass_heatmap': guass_heatmap}
 
 class PoseDataset(Dataset):
 

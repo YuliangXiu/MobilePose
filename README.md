@@ -28,7 +28,7 @@ Some codes for mobilenetV2 and display are brought from [pytorch-mobilenet-v2](h
 
 ## Pretrained Model
 
-[Resnet18+MobilenetV2](https://pan.baidu.com/s/17V6fXWLZaZN7D9h8OkwyMg)
+**Resnet18+MobilenetV2** [ [Google Drive](https://drive.google.com/drive/folders/1DB7_Nvn5dLpsUd23_SBJDwBOToW85W-F?usp=sharing) | [Baidu Yun](https://pan.baidu.com/s/17V6fXWLZaZN7D9h8OkwyMg) ]
 
 ## Usage
 

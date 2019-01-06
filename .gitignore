@@ -6,6 +6,7 @@
 !requirements.txt
 *.pyc
 models
+results
 __pycache__
 others
 .vscode

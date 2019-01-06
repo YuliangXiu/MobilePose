@@ -22,8 +22,6 @@ import torch
 from scipy.ndimage import maximum_filter, gaussian_filter
 from skimage import io, transform
 
-from torch.autograd import Variable
-
 class ResEstimator:
     def __init__(self, graph_path, target_size=(224, 224)):
         self.target_size = target_size
@@ -74,13 +72,23 @@ class ResEstimator:
         pose_fun = lambda x: (((x.reshape([-1,2])-[left_pad, top_pad]) * 1.0 /np.array([new_w, new_h])*np.array([w,h])))
         return {'image': image, 'pose_fun': pose_fun}
 
+    # def to_tensor(self, image):
+    #     x_mean = np.mean(image[:,:,3])
+    #     x_std = np.std(image[:,:,3])
+    #     y_mean = np.mean(image[:,:,4])
+    #     y_std = np.std(image[:,:,4])
+    #     mean=np.array([0.485, 0.456, 0.406, x_mean, y_mean])
+    #     std=np.array([0.229, 0.224, 0.225, x_std, y_std])        
+    #     image = torch.from_numpy(((image-mean)/std).transpose((2, 0, 1))).float()
+    #     return image
+
     def to_tensor(self, image):
-        x_mean = np.mean(image[:,:,3])
-        x_std = np.std(image[:,:,3])
-        y_mean = np.mean(image[:,:,4])
-        y_std = np.std(image[:,:,4])
-        mean=np.array([0.485, 0.456, 0.406, x_mean, y_mean])
-        std=np.array([0.229, 0.224, 0.225, x_std, y_std])        
+        # x_mean = np.mean(image[:,:,3])
+        # x_std = np.std(image[:,:,3])
+        # y_mean = np.mean(image[:,:,4])
+        # y_std = np.std(image[:,:,4])
+        mean=np.array([0.485, 0.456, 0.406])
+        std=np.array([0.229, 0.224, 0.225])        
         image = torch.from_numpy(((image-mean)/std).transpose((2, 0, 1))).float()
         return image
 
@@ -90,17 +98,17 @@ class ResEstimator:
         width = canvas.shape[1]
 
         if 'resnet' in model:
-            rescale_out = self.rescale(in_npimg, (227,227))
+            rescale_out = self.rescale(in_npimg, (224,224))
         elif 'mobilenet' in model:
             rescale_out = self.wrap(in_npimg, (224,224))
         
         image = rescale_out['image']
-        image = self.addlayer(image)
+        # image = self.addlayer(image)
         image = self.to_tensor(image)
         image = image.unsqueeze(0)
         pose_fun = rescale_out['pose_fun']
 
-        keypoints = self.net(Variable(image))
+        keypoints = self.net(image)
         keypoints = keypoints.data.cpu().numpy()
         keypoints = pose_fun(keypoints).astype(int)
 

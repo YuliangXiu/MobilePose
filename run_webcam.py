@@ -22,9 +22,12 @@ import torch.nn as nn
 from torchvision import models
 
 from estimator import ResEstimator
-import matplotlib.pyplot as plt
 from networks import *
 from dataloader import crop_camera
+
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
     
@@ -37,6 +40,7 @@ if __name__ == '__main__':
     # load the model 
     w, h = model_wh(get_graph_path(args.model))
     e = ResEstimator(get_graph_path(args.model), target_size=(w,h))
+
     # initial the camera
     cam = cv2.VideoCapture(args.camera)
 
@@ -55,3 +59,11 @@ if __name__ == '__main__':
             break
 
     cv2.destroyAllWindows()
+
+    # single person rgb image test
+    # modelpath = "./models/resnet_224_1148.4120635986328.t7"
+    # e = ResEstimator(modelpath, target_size=(224,224))
+    # image = cv2.imread("./pose_dataset/mpii/images/000001163.jpg")
+    # humans = e.inference(image, modelpath)
+    # image = ResEstimator.draw_humans(image, humans, imgcopy=False)
+    # cv2.imwrite("./results/test.jpg", image)

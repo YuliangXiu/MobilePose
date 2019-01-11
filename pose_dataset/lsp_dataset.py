@@ -10,7 +10,7 @@ import glob
 import re
 import os.path
 
-from scripts.config import *
+from config import *
 
 
 def create_data(images_dir, joints_mat_path, transpose_order=(2, 0, 1)):
@@ -35,7 +35,7 @@ def create_data(images_dir, joints_mat_path, transpose_order=(2, 0, 1)):
         index = int(re.search(r'im([0-9]+)', basename(img_path)).groups()[0]) - 1
         joints_str_list = [str(j) if j > 0 else '-1' for j in joints[index].flatten().tolist()]
 
-        out_list = [img_path]
+        out_list = [os.path.basename(img_path)]
         out_list.extend(joints_str_list)
         out_str = ','.join(out_list)
 

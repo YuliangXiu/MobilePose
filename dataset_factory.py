@@ -12,12 +12,14 @@ def get_transform(modeltype, input_size):
     :param input_size:
     :return:
     """
-    if "resnet" in modeltype:
-        return Rescale((input_size, input_size))
-    elif "mobilenet" in modeltype:
-        return Wrap((input_size, input_size))
-    else:
-        raise ValueError("modeltype is not wrong")
+    # if "resnet" in modeltype:
+    #     return Rescale((input_size, input_size))
+    # elif "mobilenet" in modeltype:
+    #     return Wrap((input_size, input_size))
+    # else:
+    #     raise ValueError("modeltype is not wrong")
+    return Rescale((input_size, input_size))
+    # return Wrap((input_size, input_size))
 
 
 class DatasetFactory:
@@ -41,7 +43,7 @@ class DatasetFactory:
                            transform=transforms.Compose([
                                Augmentation(),
                                get_transform(modeltype, input_size),
-                               Expansion(),
+                            #    Expansion(),
                                ToTensor()
                            ]))
 
@@ -61,6 +63,6 @@ class DatasetFactory:
             csv_file=os.path.join(ROOT_DIR, csv_name),
             transform=transforms.Compose([
                 get_transform(modeltype, input_size),
-                Expansion(),
+                # Expansion(),
                 ToTensor()
             ]))

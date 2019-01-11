@@ -45,8 +45,8 @@ def display_pose( img, pose, ids):
     colors_skeleton = ['r', 'y', 'y', 'g', 'g', 'y', 'y', 'g', 'g', 'm', 'm', 'g', 'g', 'y','y']
     img = img*std+mean
     img_width, img_height,_ = img.shape
-    # pose *= np.array([img_width, img_height]) # rescale [0,1]
-    pose = ((pose + 1)* np.array([img_width, img_height])-1)/2 # pose ~ [-1,1]
+    pose *= -1.0 * np.array([img_width, img_height]) # rescale [0,1]
+    # pose = ((pose + 1)* np.array([img_width, img_height])-1)/2 # pose ~ [-1,1]
     plt.subplot(25,4,ids+1)
     ax = plt.gca()
     plt.imshow(img)
@@ -82,8 +82,8 @@ class Wrap(object):
         self.output_size = output_size
 
     def __call__(self, sample):
-        image_, pose_ = sample['image']/256.0, sample['pose']
 
+        image_, pose_ = sample['image']/256.0, sample['pose']
         h, w = image_.shape[:2]
         if isinstance(self.output_size, int):
             if h > w:
@@ -96,7 +96,9 @@ class Wrap(object):
         new_h, new_w = int(new_h), int(new_w)
 
         image = transform.resize(image_, (new_w, new_h))
-        pose = (pose_.reshape([-1,2])/np.array([w,h])*np.array([new_w,new_h])).flatten()
+        pose = pose_.reshape([-1,2])/np.array([w,h])
+        pose *= -1.0
+
         return {'image': image, 'pose': pose}
 
 
@@ -127,8 +129,9 @@ class Rescale(object):
                         for c in range(3)], axis=2)
         pose = (pose_.reshape([-1,2])/np.array([w,h])*np.array([new_w,new_h]))
         pose += [left_pad, top_pad]
-        # pose /= self.output_size # pose ~ [0,1]
-        pose = (pose * 2 + 1) / self.output_size - 1 # pose ~ [-1,1]
+        pose /= self.output_size # pose ~ [0,-1]
+        pose *= -1.0
+        # pose = (pose * 2 + 1) / self.output_size - 1 # pose ~ [-1,1]
         # pose = pose.flatten()
 
         return {'image': image, 'pose': pose}
@@ -240,14 +243,54 @@ class Augmentation(object):
     def __call__(self, sample):
         image, pose= sample['image'], sample['pose'].reshape([-1,2])
 
+        sometimes = lambda aug: iaa.Sometimes(0.3, aug)
+
+        seq = iaa.Sequential(
+            [
+                # Apply the following augmenters to most images.
+
+                sometimes(iaa.CropAndPad(percent=(-0.25, 0.25), pad_mode=["edge"], keep_size=False)),
+
+                sometimes(iaa.Affine(
+                    scale={"x": (0.75, 1.25), "y": (0.75, 1.25)},
+                    translate_percent={"x": (-0.2, 0.2), "y": (-0.2, 0.2)},
+                    rotate=(-30, 30),
+                    shear=(-5, 5),
+                    order=[0, 1],
+                    cval=(0, 255),
+                    mode=ia.ALL
+                )),
+
+                iaa.SomeOf((0, 3),
+                    [
+        
+                        iaa.OneOf([
+                            iaa.GaussianBlur((0, 3.0)),
+                            # iaa.AverageBlur(k=(2, 7)),
+                            iaa.MedianBlur(k=(3, 11)),
+                            iaa.MotionBlur(k=5,angle=[-45, 45])
+                        ]),
+
+                        iaa.OneOf([
+                            iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, 0.05*255), per_channel=0.5),
+                            iaa.AdditivePoissonNoise(lam=(0,8), per_channel=True),
+                        ]),
+
+                        iaa.OneOf([
+                            iaa.Add((-10, 10), per_channel=0.5),
+                            iaa.Multiply((0.2, 1.2), per_channel=0.5),
+                            iaa.ContrastNormalization((0.5, 2.0), per_channel=0.5),
+                        ]),
+                    ],
+                    # do all of the above augmentations in random order
+                    random_order=True
+                )
+            ],
+            # do all of the above augmentations in random order
+            random_order=True
+        )
+
         # augmentation choices
-        seq = iaa.SomeOf(2, [
-            iaa.Sometimes(0.4, iaa.Scale((0.5, 1.0))),
-            iaa.Sometimes(0.6, iaa.CropAndPad(percent=(-0.25, 0.25), pad_mode=["edge"], keep_size=False)),
-            iaa.Fliplr(0.1), 
-            iaa.Sometimes(0.4, iaa.AdditiveGaussianNoise(scale=(0, 0.05*50))),
-            iaa.Sometimes(0.1, iaa.GaussianBlur(sigma=(0, 3.0)))
-        ])
         seq_det = seq.to_deterministic()
 
         image_aug = seq_det.augment_images([image])[0]

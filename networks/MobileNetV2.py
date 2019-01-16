@@ -1,5 +1,5 @@
 '''
-File: mobilenetv2.py
+File: MobileNetV2.py
 Project: MobilePose
 File Created: Thursday, 8th March 2018 2:51:18 pm
 Author: Yuliang Xiu (yuliangxiu@sjtu.edu.cn)
@@ -61,9 +61,9 @@ class InvertedResidual(nn.Module):
             return self.conv(x)
 
 
-class MobileNetV2(nn.Module):
-    def __init__(self, image_channel=5, n_class=32, input_size=224, width_mult=1.):
-        super(MobileNetV2, self).__init__()
+class MobileNet(nn.Module):
+    def __init__(self, image_channel=3, n_class=32, input_size=224, width_mult=1.):
+        super(MobileNet, self).__init__()
         # setting of inverted residual blocks
         self.interverted_residual_setting = [
             # t, c, n, s
@@ -72,7 +72,7 @@ class MobileNetV2(nn.Module):
             [6, 32, 3, 2],
             [6, 64, 4, 2],
             [6, 96, 3, 1],
-            [6, 160, 3, 2],
+            [6, 160, 3, 1],
             [6, 320, 1, 1],
         ]
 
@@ -80,7 +80,7 @@ class MobileNetV2(nn.Module):
         assert input_size % 32 == 0
         input_channel = int(32 * width_mult)
         self.last_channel = int(1280 * width_mult) if width_mult > 1.0 else 1280
-        self.features = [conv_bn(image_channel, input_channel, 2)]
+        self.features = [conv_bn(image_channel, input_channel, 1)]
         # building inverted residual blocks
         for t, c, n, s in self.interverted_residual_setting:
             output_channel = int(c * width_mult)
@@ -92,7 +92,7 @@ class MobileNetV2(nn.Module):
                 input_channel = output_channel
         # building last several layers
         self.features.append(conv_1x1_bn(input_channel, self.last_channel))
-        self.features.append(nn.AvgPool2d(int(input_size/32)))
+        # self.features.append(nn.AvgPool2d(int(input_size/32)))
         # make it nn.Sequential
         self.features = nn.Sequential(*self.features)
 
@@ -124,4 +124,11 @@ class MobileNetV2(nn.Module):
                 n = m.weight.size(1)
                 m.weight.data.normal_(0, 0.01)
                 m.bias.data.zero_()
+
+def mobilenetv2_ed(width_mult=1.0):
+    model = MobileNet(width_mult=width_mult)
+    model = nn.Sequential(*(list(model.children())[:-1]))
+    for param in model.parameters():
+        param.requires_grad = True
+    return model
                 

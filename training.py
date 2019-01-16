@@ -46,7 +46,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     modeltype = args.model
 
-    device = torch.device("cuda:0" if len(args.gpu)>0 else "cpu")
+    device = torch.device("cuda:0" if len(args.gpu)>1 else "cuda")
 
     # user defined parameters
     num_threads = multiprocessing.cpu_count()
@@ -57,19 +57,10 @@ if __name__ == '__main__':
     os.environ["CUDA_VISIBLE_DEVICES"]=args.gpu
     torch.backends.cudnn.enabled = True
     cudnn.benchmark = True
-    gpus = [0]
+
     print("GPU NUM: %d"%(torch.cuda.device_count()))
-
-    if modeltype == "resnet18":
-        net = CoordRegressionNetwork(n_locations=16, backbone="resnet18").to(device)
-    elif modeltype == "resnet34":
-        net = CoordRegressionNetwork(n_locations=16, backbone="resnet34").to(device)
-    elif modeltype == "resnet50":
-        net = CoordRegressionNetwork(n_locations=16, backbone="resnet50").to(device)
-    elif modeltype == "unet":
-        net = CoordRegressionNetwork(n_locations=16, backbone="unet").to(device)
-
-    net = torch.nn.DataParallel(net, device_ids=gpus).to(device)
+    net = CoordRegressionNetwork(n_locations=16, backbone=modeltype).to(device)
+    net = torch.nn.DataParallel(net).to(device)
 
     learning_rate = args.lr
     batchsize = args.batchsize
@@ -87,7 +78,6 @@ if __name__ == '__main__':
         for param in list(net.parameters()):
             param.requires_grad = True
 
-    # net = nn.DataParallel(net ,device_ids=[0,1])
     net = net.train()
 
     PATH_PREFIX = './models' # path to save the model
@@ -103,8 +93,8 @@ if __name__ == '__main__':
 
 
     criterion = nn.MSELoss().to(device)
-    optimizer = optim.Adam(net.parameters(), lr=learning_rate, betas=(0.9, 0.999), eps=1e-08)
-    # optimizer = optim.SGD(net.parameters(), lr=learning_rate, momentum=0.9)
+    # optimizer = optim.Adam(net.parameters(), lr=learning_rate, betas=(0.9, 0.999), eps=1e-08)
+    optimizer = optim.SGD(net.parameters(), lr=learning_rate, momentum=0.9)
     # optimizer = optim.RMSprop(net.parameters(), lr=learning_rate)
 
     scheduler = StepLR(optimizer, step_size=30, gamma=0.3)
@@ -133,6 +123,8 @@ if __name__ == '__main__':
             reg_losses = dsntnn.js_reg_losses(heatmaps, poses, sigma_t=1.0)
             # Combine losses into an overall loss
             loss = dsntnn.average_loss(euc_losses + reg_losses)
+
+            del data, images, poses, coords, heatmaps
         
             optimizer.zero_grad()
             loss.backward()
@@ -145,6 +137,8 @@ if __name__ == '__main__':
         if epoch%2==0:
 
             valid_loss_epoch = []
+            valid_loss_epoch_coords = []
+            valid_loss_epoch_hm = []
 
             with torch.no_grad():  
                 for i_batch, sample_batched in enumerate(tqdm(test_dataloader)):
@@ -160,27 +154,33 @@ if __name__ == '__main__':
                     # Combine losses into an overall loss
                     loss = dsntnn.average_loss(euc_losses + reg_losses)
 
+                    del sample_batched, images, poses, coords, heatmaps
+
                     valid_loss_epoch.append(loss.item())
+                    valid_loss_epoch_coords.append(torch.mean(euc_losses).item())
+                    valid_loss_epoch_hm.append(torch.mean(reg_losses).item())
 
             if np.mean(np.array(valid_loss_epoch)) < minloss:
                 # save the model
                 minloss = np.mean(np.array(valid_loss_epoch))
                 checkpoint_file = "%s/%s_%.4f.t7"%(PATH_PREFIX, modelname, minloss)
-                checkpoint_best_file = "%s/%s_wrap_best.t7"%(PATH_PREFIX, modelname)
+                checkpoint_best_file = "%s/%s_sgd_best.t7"%(PATH_PREFIX, modelname)
                 # torch.save(net, checkpoint_file)
                 torch.save(net.module.state_dict(), checkpoint_best_file)
                 print('==> checkpoint model saving to %s and %s'%(checkpoint_file, checkpoint_best_file))
 
-            print('[epoch %d] train loss(coords): %.8f, train loss(hm): %.8f, valid loss: %.8f' %
-                (epoch + 1, np.mean(np.array(train_loss_epoch_coords)), np.mean(np.array(train_loss_epoch_hm)), np.mean(np.array(valid_loss_epoch))))
+            print('[epoch %d] train loss(coords): %.8f, train loss(hm): %.8f, train loss: %.8f,\n          valid loss(coords): %.8f, valid loss(hm): %.8f, valid loss: %.8f\n' %
+                (epoch + 1, np.mean(np.array(train_loss_epoch_coords)), np.mean(np.array(train_loss_epoch_hm)), np.mean(np.array(train_loss_epoch)), 
+                 np.mean(np.array(valid_loss_epoch_coords)), np.mean(np.array(valid_loss_epoch_hm)), np.mean(np.array(valid_loss_epoch))))
 
             # write the log of the training process
             if not os.path.exists(PATH_PREFIX):
                 os.makedirs(PATH_PREFIX)
 
             with open(os.path.join(PATH_PREFIX,logname), 'a+') as file_output:
-                file_output.write('[epoch %d] train loss(coords): %.8f, train loss(hm): %.8f, valid loss: %.8f\n' %
-                (epoch + 1, np.mean(np.array(train_loss_epoch_coords)), np.mean(np.array(train_loss_epoch_hm)), np.mean(np.array(valid_loss_epoch))))
+                file_output.write('[epoch %d] train loss(coords): %.8f, train loss(hm): %.8f, train loss: %.8f,\n          valid loss(coords): %.8f, valid loss(hm): %.8f, valid loss: %.8f\n' %
+                (epoch + 1, np.mean(np.array(train_loss_epoch_coords)), np.mean(np.array(train_loss_epoch_hm)), np.mean(np.array(train_loss_epoch)), 
+                 np.mean(np.array(valid_loss_epoch_coords)), np.mean(np.array(valid_loss_epoch_hm)), np.mean(np.array(valid_loss_epoch))))
                 file_output.flush() 
                 
     print('Finished Training')

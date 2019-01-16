@@ -7,4 +7,6 @@ from .psp_net import *
 from .seg_net import *
 from .u_net import *
 from .resnet import *
-from .mobilenetv2 import *
+from .MobileNetV2 import *
+from .senet import *
+from .ShuffleNetV2 import *

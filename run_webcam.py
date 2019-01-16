@@ -25,8 +25,8 @@ from estimator import ResEstimator
 from networks import *
 from dataloader import crop_camera
 
-import matplotlib
-matplotlib.use('Agg')
+# import matplotlib
+# matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 if __name__ == '__main__':

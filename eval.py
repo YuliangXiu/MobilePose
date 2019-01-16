@@ -20,9 +20,11 @@ from math import ceil
 import argparse
 
 import os
+import multiprocessing
 from dataloader import *
 from coco_utils import *
 from networks import *
+from network import CoordRegressionNetwork
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
 from dataset_factory import DatasetFactory
@@ -39,10 +41,9 @@ def eval_coco(all_test_data, net_path, result_gt_json_path, result_pred_json_pat
         'result-gt-json.txt', 'result-pred-json.txt')
         """
         # gpu mode
-        net = Net().to(device)
-        net = torch.load(net_path).to(device)
-        net.eval()
-        net.train(False)
+        net = CoordRegressionNetwork(n_locations=16, backbone="resnet18").to(device)
+        net.load_state_dict(torch.load(net_path))
+        net = net.eval()
 
         # cpu mode
         # net = Net()
@@ -81,10 +82,10 @@ def eval_coco(all_test_data, net_path, result_gt_json_path, result_pred_json_pat
             # sample_data['image'] = all_test_data['image'][100 * (i - 1) : min(100 * i, total_size)]
 
             # t0 = time.time()
-            output = net(sample_data['image'])
-            # print('FPS is %f'%(1.0/((time.time()-t0)/len(sample_data['image']))))
-
-            transform_to_coco_pred(output, all_coco_pred_annotations_arr, bs * (i - 1))
+            with torch.no_grad():
+                coords, heatmaps = net(sample_data['image'])
+                
+            transform_to_coco_pred(coords.view(-1,16*2), all_coco_pred_annotations_arr, bs * (i - 1))
 
         all_coco_pred_annotations_arr = [item._asdict() for item in all_coco_pred_annotations_arr]
         result_pred_json = json.dumps(all_coco_pred_annotations_arr, cls=MyEncoder)
@@ -105,36 +106,34 @@ if __name__ == '__main__':
     parser.add_argument('--model', type=str, required=True, default="")
     parser.add_argument('--gpu', type=str, required=True, default="")
     args = parser.parse_args()
+
     modelpath = args.model
 
     device = torch.device("cuda" if len(args.gpu)>0 else "cpu")
 
     # user defined parameters
-    num_threads = 10
-    input_size_dict = {"resnet": 224, "mobilenet" :227}
+    num_threads = multiprocessing.cpu_count()
     PATH_PREFIX = "./results/{}".format(modelpath.split(".")[0])
 
     input_size = 0
     modeltype = ""
 
-    for key in input_size_dict.keys():
-        if key in modelpath:
-            input_size = input_size_dict[key]
-            modeltype = key
+    if "resnet18" in modelpath:
+        modeltype = "resnet"
+        input_size  = 224
 
     test_dataset = DatasetFactory.get_test_dataset(modeltype, input_size)
 
     print("Loading testing dataset, wait...")
-
-    test_dataloader = DataLoader(test_dataset, batch_size= len(test_dataset),
+    bs_test = len(test_dataset)
+    test_dataloader = DataLoader(test_dataset, batch_size= bs_test,
                             shuffle=False, num_workers = num_threads)
 
     # get all test data
     all_test_data = {}
     for i_batch, sample_batched in enumerate(tqdm(test_dataloader)):
         all_test_data = sample_batched
-
-    eval_coco(all_test_data, modelpath, os.path.join(PATH_PREFIX, 'result-gt-json.txt'), os.path.join(PATH_PREFIX, 'result-pred-json.txt'))
+        eval_coco(all_test_data, modelpath, os.path.join(PATH_PREFIX, 'result-gt-json.txt'), os.path.join(PATH_PREFIX, 'result-pred-json.txt'))
 
     # evaluation
     annType = ['segm','bbox','keypoints']

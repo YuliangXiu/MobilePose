@@ -24,6 +24,9 @@ import torch.optim as optim
 import torch.backends.cudnn as cudnn
 from torch.utils.data import Dataset, DataLoader
 from torchvision import datasets, transforms, utils, models
+
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 def crop_camera(image, ratio=0.15):
@@ -43,10 +46,10 @@ def display_pose( img, pose, ids):
     colors = ['g', 'g', 'g', 'g', 'g', 'g', 'm', 'm', 'r', 'r', 'y', 'y', 'y', 'y','y','y']
     pairs = [[8,9],[11,12],[11,10],[2,1],[1,0],[13,14],[14,15],[3,4],[4,5],[8,7],[7,6],[6,2],[6,3],[8,12],[8,13]]
     colors_skeleton = ['r', 'y', 'y', 'g', 'g', 'y', 'y', 'g', 'g', 'm', 'm', 'g', 'g', 'y','y']
-    img = img*std+mean
+    img = np.clip(img*std+mean, 0.0, 1.0)
     img_width, img_height,_ = img.shape
-    pose *= -1.0 * np.array([img_width, img_height]) # rescale [0,1]
-    # pose = ((pose + 1)* np.array([img_width, img_height])-1)/2 # pose ~ [-1,1]
+    pose = ((pose + 1)* np.array([img_width, img_height])-1)/2 # pose ~ [-1,1]
+
     plt.subplot(25,4,ids+1)
     ax = plt.gca()
     plt.imshow(img)
@@ -54,10 +57,12 @@ def display_pose( img, pose, ids):
         plt.plot(pose[idx,0], pose[idx,1], marker='o', color=colors[idx])
     for idx in range(len(colors_skeleton)):
         plt.plot(pose[pairs[idx],0], pose[pairs[idx],1],color=colors_skeleton[idx])
+
     xmin = np.min(pose[:,0])
     ymin = np.min(pose[:,1])
     xmax = np.max(pose[:,0])
     ymax = np.max(pose[:,1])
+
     bndbox = np.array(expand_bbox(xmin, xmax, ymin, ymax, img_width, img_height))
     coords = (bndbox[0], bndbox[1]), bndbox[2]-bndbox[0]+1, bndbox[3]-bndbox[1]+1
     ax.add_patch(plt.Rectangle(*coords, fill=False, edgecolor='yellow', linewidth=1))
@@ -129,10 +134,7 @@ class Rescale(object):
                         for c in range(3)], axis=2)
         pose = (pose_.reshape([-1,2])/np.array([w,h])*np.array([new_w,new_h]))
         pose += [left_pad, top_pad]
-        pose /= self.output_size # pose ~ [0,-1]
-        pose *= -1.0
-        # pose = (pose * 2 + 1) / self.output_size - 1 # pose ~ [-1,1]
-        # pose = pose.flatten()
+        pose = (pose * 2 + 1) / self.output_size - 1 # pose ~ [-1,1]
 
         return {'image': image, 'pose': pose}
 
@@ -253,8 +255,8 @@ class Augmentation(object):
 
                 sometimes(iaa.Affine(
                     scale={"x": (0.75, 1.25), "y": (0.75, 1.25)},
-                    translate_percent={"x": (-0.2, 0.2), "y": (-0.2, 0.2)},
-                    rotate=(-30, 30),
+                    translate_percent={"x": (-0.25, 0.25), "y": (-0.25, 0.25)},
+                    rotate=(-45, 45),
                     shear=(-5, 5),
                     order=[0, 1],
                     cval=(0, 255),

@@ -14,15 +14,15 @@ Some codes for networks and display are brought from:
 - Python 3.6
 - PyTorch 0.4 
 
-
 ## Evaluation Results
 
 |Model|Parmas(M)|Flops(G)|mAP(0.5IoU)|mAR(0.5IoU)|Google Drive|
 |---|---|---|---|---|---|
-|ResNet18+DSNTNN|10.66|32.66|0.901|0.947|[43M](https://drive.google.com/open?id=1MoAQoQyThrluGrRv6ZaKlrM14yvkCWrt)|
+|UNet|29.60|9.37|||[119M]()|
+|ResNet18+DUC+DSNTNN|12.26|1.64|||[50M]()|
+|ResNet18(stride=2)+DSNTNN|10.66|32.66|0.901|0.947|[43M](https://drive.google.com/open?id=1MoAQoQyThrluGrRv6ZaKlrM14yvkCWrt)|
 |MobileNetV2+DUC+DSNTNN|3.91|0.49|0.807|0.899|[16M](https://drive.google.com/open?id=1Meyz8Jg2aRe8ijeBAY1uCRpV9l5OJoXl)|
 |ShuffleNetV2+DUC+DSNTNN|2.92|0.31|0.637|0.796|[12M](https://drive.google.com/open?id=1pKChewpUFA0CINdLUnV9sUxkscTF5Q_0)|
-
 
 ## Features
 
@@ -31,7 +31,7 @@ Some codes for networks and display are brought from:
 - [x] performance evaluation (eval.py)
 - [x] multiple models support (network.py)
 - [x] ipython notebook visualization (demo.ipynb)
-- [-] Macbook camera realtime display script (run_webcam.py)
+- [ ] Macbook camera realtime display script (run_webcam.py)
 
 ## Usage
 
@@ -46,10 +46,6 @@ cd cocoapi/PythonAPI && make
 
 python eval.py --t7=./models/resnet18_224_sgd_best.t7 --model=resnet18 --gpu=0
 ```
-3. Realtime visualization(ongoing..):
-```shell
-python run_webcam.py --model=resnet18
-```
 
 ## Contributors
 
@@ -58,4 +54,3 @@ MobilePose is developed and maintained by [Yuliang Xiu](http://xiuyuliang.cn/abo
 ## License
 
 MobilePose is freely available for free non-commercial use. For commercial queries, please contact [Cewu Lu](http://www.mvig.org/).
-

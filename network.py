@@ -25,7 +25,7 @@ class CoordRegressionNetwork(nn.Module):
             self.outsize = 64
         elif backbone == "resnet18":
             self.resnet = resnet.resnet18_ed(pretrained=False)
-            self.outsize = 512
+            self.outsize = 32
         elif backbone == "resnet34":
             self.resnet = resnet.resnet34_ed(pretrained=False)
             self.outsize = 512

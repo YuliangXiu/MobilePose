@@ -18,7 +18,7 @@ Some codes for networks and display are brought from:
 
 |Model|Parmas(M)|Flops(G)|mAP(0.5IoU)|mAR(0.5IoU)|Google Drive|
 |---|---|---|---|---|---|
-|UNet|29.60|9.37|||[119M]()|
+|UNet+DSNTNN|29.60|9.37|||[119M]()|
 |ResNet18+DUC+DSNTNN|12.26|1.64|||[50M]()|
 |ResNet18(stride=2)+DSNTNN|10.66|32.66|0.901|0.947|[43M](https://drive.google.com/open?id=1MoAQoQyThrluGrRv6ZaKlrM14yvkCWrt)|
 |MobileNetV2+DUC+DSNTNN|3.91|0.49|0.807|0.899|[16M](https://drive.google.com/open?id=1Meyz8Jg2aRe8ijeBAY1uCRpV9l5OJoXl)|

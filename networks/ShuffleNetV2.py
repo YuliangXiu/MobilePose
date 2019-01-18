@@ -5,6 +5,7 @@ from torch.autograd import Variable
 from collections import OrderedDict
 from torch.nn import init
 import math
+from .DUC import DUC
 
 def conv_bn(inp, oup, stride):
     return nn.Sequential(
@@ -126,9 +127,8 @@ class ShuffleNet(nn.Module):
 
         # building first layer
         input_channel = self.stage_out_channels[1]
-        self.conv1 = conv_bn(3, input_channel, 1)
-        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=1, padding=1)
-        # self.maxpool = conv_bn(input_channel, input_channel, 1)
+        self.conv1 = conv_bn(3, input_channel, 2)
+        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         
         self.features = []
         # building inverted residual blocks
@@ -143,13 +143,18 @@ class ShuffleNet(nn.Module):
                     self.features.append(InvertedResidual(input_channel, output_channel, 1, 1))
                 input_channel = output_channel
                 
+                
         # make it nn.Sequential
         self.features = nn.Sequential(*self.features)
 
         # building last several layers
-        self.conv_last = conv_1x1_bn(input_channel, self.stage_out_channels[-1])
+        self.conv_last      = conv_1x1_bn(input_channel, self.stage_out_channels[-1])
+        self.conv_compress = nn.Conv2d(1024, 256, 1, 1, 0, bias=False)
+        self.duc1 = DUC(256, 512, upscale_factor=2)
+        self.duc2 = DUC(128, 256, upscale_factor=2)
+        self.duc3 = DUC(64, 128, upscale_factor=2)
         self.globalpool = nn.Sequential(nn.AvgPool2d(int(input_size/32)))              
-        
+    
         # building classifier
         self.classifier = nn.Sequential(nn.Linear(self.stage_out_channels[-1], n_class))
 
@@ -158,10 +163,16 @@ class ShuffleNet(nn.Module):
         x = self.maxpool(x)
         x = self.features(x)
         x = self.conv_last(x)
+        x = self.conv_compress(x)
+        x = self.duc1(x)
+        x = self.duc2(x)
+        x = self.duc3(x)
+
         x = self.globalpool(x)
         x = x.view(-1, self.stage_out_channels[-1])
         x = self.classifier(x)
         return x
+
 
 def shufflenetv2_ed(width_mult=1.):
     model = ShuffleNet(width_mult=width_mult)

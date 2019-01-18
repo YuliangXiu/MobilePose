@@ -34,14 +34,14 @@ os.environ["CUDA_VISIBLE_DEVICES"]="0"
 torch.backends.cudnn.enabled = True
 print("GPU NUM: ", torch.cuda.device_count())
 
-def eval_coco(all_test_data, net_path, result_gt_json_path, result_pred_json_path):
+def eval_coco(all_test_data, modelname, net_path, result_gt_json_path, result_pred_json_path):
         """
         Example:
         eval_coco('/home/yuliang/code/PoseFlow/checkpoint140.t7', 
         'result-gt-json.txt', 'result-pred-json.txt')
         """
         # gpu mode
-        net = CoordRegressionNetwork(n_locations=16, backbone="resnet18").to(device)
+        net = CoordRegressionNetwork(n_locations=16, backbone=modelname).to(device)
         net.load_state_dict(torch.load(net_path))
         net = net.eval()
 
@@ -104,10 +104,11 @@ if __name__ == '__main__':
     
     parser = argparse.ArgumentParser(description='MobilePose Demo')
     parser.add_argument('--model', type=str, required=True, default="")
+    parser.add_argument('--t7', type=str, required=True, default="")
     parser.add_argument('--gpu', type=str, required=True, default="")
     args = parser.parse_args()
 
-    modelpath = args.model
+    modelpath = args.t7
 
     device = torch.device("cuda" if len(args.gpu)>0 else "cpu")
 
@@ -115,14 +116,10 @@ if __name__ == '__main__':
     num_threads = multiprocessing.cpu_count()
     PATH_PREFIX = "./results/{}".format(modelpath.split(".")[0])
 
-    input_size = 0
-    modeltype = ""
+    input_size = 224
+    modelname = args.model
 
-    if "resnet18" in modelpath:
-        modeltype = "resnet"
-        input_size  = 224
-
-    test_dataset = DatasetFactory.get_test_dataset(modeltype, input_size)
+    test_dataset = DatasetFactory.get_test_dataset("resnet", input_size)
 
     print("Loading testing dataset, wait...")
     bs_test = len(test_dataset)
@@ -133,7 +130,7 @@ if __name__ == '__main__':
     all_test_data = {}
     for i_batch, sample_batched in enumerate(tqdm(test_dataloader)):
         all_test_data = sample_batched
-        eval_coco(all_test_data, modelpath, os.path.join(PATH_PREFIX, 'result-gt-json.txt'), os.path.join(PATH_PREFIX, 'result-pred-json.txt'))
+        eval_coco(all_test_data, modelname, modelpath, os.path.join(PATH_PREFIX, 'result-gt-json.txt'), os.path.join(PATH_PREFIX, 'result-pred-json.txt'))
 
     # evaluation
     annType = ['segm','bbox','keypoints']

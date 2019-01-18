@@ -37,10 +37,10 @@ class CoordRegressionNetwork(nn.Module):
             self.outsize = 512
         elif backbone == "shufflenetv2":
             self.resnet = ShuffleNetV2.shufflenetv2_ed(width_mult=1.0)
-            self.outsize = 1024
+            self.outsize = 32
         elif backbone == "mobilenetv2":
             self.resnet = MobileNetV2.mobilenetv2_ed(width_mult=1.0)
-            self.outsize = 1280
+            self.outsize = 32
 
         self.hm_conv = nn.Conv2d(self.outsize, n_locations, kernel_size=1, bias=False)
 

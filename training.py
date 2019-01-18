@@ -49,7 +49,7 @@ if __name__ == '__main__':
     device = torch.device("cuda:0" if len(args.gpu)>1 else "cuda")
 
     # user defined parameters
-    num_threads = multiprocessing.cpu_count()
+    num_threads = int(multiprocessing.cpu_count()/2)
     minloss = np.float("inf")
     # minloss = 0.43162785
 

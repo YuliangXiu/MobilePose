@@ -8,7 +8,7 @@ import os
 annType = ['segm','bbox','keypoints']
 annType = annType[2]      #specify type here
 prefix = 'person_keypoints' if annType=='keypoints' else 'instances'
-print 'Running demo for *%s* results.'%(annType)
+print('Running demo for *%s* results.'%(annType))
 
 PATH_PREFIX = "./txts/scale2"
 

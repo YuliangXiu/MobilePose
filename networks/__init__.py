@@ -10,3 +10,4 @@ from .resnet import *
 from .MobileNetV2 import *
 from .senet import *
 from .ShuffleNetV2 import *
+from .squeezenet import *

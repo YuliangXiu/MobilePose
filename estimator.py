@@ -23,41 +23,14 @@ from scipy.ndimage import maximum_filter, gaussian_filter
 from skimage import io, transform
 
 class ResEstimator:
-    def __init__(self, graph_path, target_size=(224, 224)):
-        self.target_size = target_size
-        self.graph_path = graph_path
-        self.net = torch.load(graph_path, map_location=lambda storage, loc: storage)
+    def __init__(self, model_path, net, inp_dim=224):
+        self.inp_dim = inp_dim
+        self.net = net
+        self.net.load_state_dict(torch.load(model_path, map_location=lambda storage, loc: storage))
         self.net.eval()
-
-    def addlayer(self, image):
-        h, w = image.shape[:2]
-        x = np.arange(0, h)
-        y = np.arange(0, w) 
-        x, y = np.meshgrid(x, y)
-        x = x[:,:, np.newaxis]
-        y = y[:,:, np.newaxis]
-        image = np.concatenate((image, x, y), axis=2)
-        
-        return image
-
-    def wrap(self, image, output_size):
-        image_ = image/256.0
-        h, w = image_.shape[:2]
-        if isinstance(output_size, int):
-            if h > w:
-                new_h, new_w = output_size * h / w, output_size
-            else:
-                new_h, new_w = output_size, output_size * w / h
-        else:
-            new_h, new_w = output_size
-
-        new_h, new_w = int(new_h), int(new_w)
-
-        image = transform.resize(image_, (new_w, new_h))
-        pose_fun = lambda x: (x.reshape([-1,2]) * 1.0 /np.array([new_w, new_h])*np.array([w,h]))
-        return {'image': image, 'pose_fun': pose_fun}
         
     def rescale(self, image, output_size):
+
         image_ = image/256.0
         h, w = image_.shape[:2]
         im_scale = min(float(output_size[0]) / float(h), float(output_size[1]) / float(w))
@@ -69,47 +42,30 @@ class ResEstimator:
         mean=np.array([0.485, 0.456, 0.406])
         pad = ((top_pad, top_pad), (left_pad, left_pad))
         image = np.stack([np.pad(image[:,:,c], pad, mode='constant', constant_values=mean[c])for c in range(3)], axis=2)
-        pose_fun = lambda x: (((x.reshape([-1,2])-[left_pad, top_pad]) * 1.0 /np.array([new_w, new_h])*np.array([w,h])))
+        pose_fun = lambda x: ((((x.reshape([-1,2])+np.array([1.0,1.0]))/2.0*np.array(output_size)-[left_pad, top_pad]) * 1.0 /np.array([new_w, new_h])*np.array([w,h])))
         return {'image': image, 'pose_fun': pose_fun}
 
-    # def to_tensor(self, image):
-    #     x_mean = np.mean(image[:,:,3])
-    #     x_std = np.std(image[:,:,3])
-    #     y_mean = np.mean(image[:,:,4])
-    #     y_std = np.std(image[:,:,4])
-    #     mean=np.array([0.485, 0.456, 0.406, x_mean, y_mean])
-    #     std=np.array([0.229, 0.224, 0.225, x_std, y_std])        
-    #     image = torch.from_numpy(((image-mean)/std).transpose((2, 0, 1))).float()
-    #     return image
-
     def to_tensor(self, image):
-        # x_mean = np.mean(image[:,:,3])
-        # x_std = np.std(image[:,:,3])
-        # y_mean = np.mean(image[:,:,4])
-        # y_std = np.std(image[:,:,4])
+     
         mean=np.array([0.485, 0.456, 0.406])
-        std=np.array([0.229, 0.224, 0.225])        
+        std=np.array([0.229, 0.224, 0.225])    
         image = torch.from_numpy(((image-mean)/std).transpose((2, 0, 1))).float()
         return image
 
-    def inference(self, in_npimg, model):
+    def inference(self, in_npimg):
         canvas = np.zeros_like(in_npimg)
         height = canvas.shape[0]
         width = canvas.shape[1]
 
-        if 'resnet' in model:
-            rescale_out = self.rescale(in_npimg, (224,224))
-        elif 'mobilenet' in model:
-            rescale_out = self.wrap(in_npimg, (224,224))
-        
+        rescale_out = self.rescale(in_npimg, (self.inp_dim, self.inp_dim))
+       
         image = rescale_out['image']
-        # image = self.addlayer(image)
         image = self.to_tensor(image)
         image = image.unsqueeze(0)
         pose_fun = rescale_out['pose_fun']
 
         keypoints = self.net(image)
-        keypoints = keypoints.data.cpu().numpy()
+        keypoints = keypoints[0].detach().numpy()
         keypoints = pose_fun(keypoints).astype(int)
 
         return keypoints

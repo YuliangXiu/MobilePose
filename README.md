@@ -12,17 +12,21 @@ Some codes for networks and display are brought from:
 ## Requirements
 
 - Python 3.6
-- PyTorch 0.4 
+- PyTorch 1.0
+- DSNTNN 1.0
 
 ## Evaluation Results
 
-|Model|Parmas(M)|Flops(G)|mAP(0.5IoU)|mAR(0.5IoU)|Google Drive|
-|---|---|---|---|---|---|
-|UNet+DSNTNN|29.60|9.37|||[119M]()|
-|ResNet18+DUC+DSNTNN|12.26|1.64|||[50M]()|
-|ResNet18(stride=2)+DSNTNN|10.66|32.66|0.901|0.947|[43M](https://drive.google.com/open?id=1MoAQoQyThrluGrRv6ZaKlrM14yvkCWrt)|
-|MobileNetV2+DUC+DSNTNN|3.91|0.49|0.807|0.899|[16M](https://drive.google.com/open?id=1Meyz8Jg2aRe8ijeBAY1uCRpV9l5OJoXl)|
-|ShuffleNetV2+DUC+DSNTNN|2.92|0.31|0.637|0.796|[12M](https://drive.google.com/open?id=1pKChewpUFA0CINdLUnV9sUxkscTF5Q_0)|
+|Model|Parmas(M)|Flops(G)|mAP(IoU=0.5:0.95)|mAP(IoU=0.5)|mAR(IoU=0.5:0.95)|mAR(IoU=0.5)|Google Drive|
+|---|---|---|---|---|---|---|---|
+|ResNet18(224x224)+DUC+DSNTNN|12.26|1.64|**0.682**|0.939|**0.797**|0.967|[50M](https://drive.google.com/open?id=17Z1zetIVDI4_8-ZoFgTRsjHtDpwGtjRT)|
+|MobileNetV2(224x224)+DUC+DSNTNN|3.91|0.49|0.675|**0.949**|0.794|**0.971**|[16M]([https://drive.google.com/open?id=1Meyz8Jg2aRe8ijeBAY1uCRpV9l5OJoXl](https://drive.google.com/open?id=15Ihv1bVQv6_tYTFlECJMNrXEmrrka5g4))|
+|ShuffleNetV2(224x224)+DUC+DSNTNN|2.92|**0.31**|0.615|0.916|0.748|0.955|[12M](https://drive.google.com/open?id=184Zg4E6HbbizPFYcELMXCd7mwWXdUd3U)|
+|SqueezeNet1.1(224x224)+DUC+DSNTNN|**2.22**|0.63|0.584|0.921|0.723|0.958|[9M](https://drive.google.com/open?id=1RePeiBJHeHvmYTQ5vAUJHC5CstHIBcP0)|
+
+<div align="center">
+    <img src="./demo.png">
+</div>
 
 ## Features
 
@@ -31,20 +35,26 @@ Some codes for networks and display are brought from:
 - [x] performance evaluation (eval.py)
 - [x] multiple models support (network.py)
 - [x] ipython notebook visualization (demo.ipynb)
-- [ ] Macbook camera realtime display script (run_webcam.py)
+- [x] Macbook camera realtime display script (run_webcam.py)
 
 ## Usage
 
 1. Training:
 ```shell
-python training.py --model=mobilenet2 --gpu=0 --inputsize=224 --lr 1e-3 --batchsize=128 --t7=./models/shufflenetv2_224_sgb_best.t7
+python training.py --model shufflenetv2 --gpu 0 --inputsize 224 --lr 1e-3 --batchsize 128 --t7 ./models/shufflenetv2_224_adam_best.t7
 ```
 2. Evaluation
 ```shell
 ln -s cocoapi/PythonAPI/pycocotools
 cd cocoapi/PythonAPI && make
 
-python eval.py --t7=./models/resnet18_224_sgd_best.t7 --model=resnet18 --gpu=0
+python eval.py --t7 ./models/resnet18_224_adam_best.t7 --model resnet18 --gpu 0
+```
+
+3. Web Camera Demo
+
+```shell
+python run_webcam.py --model squeezenet --inp_dim 224 --camera 0
 ```
 
 ## Contributors

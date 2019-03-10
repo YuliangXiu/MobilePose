@@ -93,11 +93,11 @@ if __name__ == '__main__':
 
 
     criterion = nn.MSELoss().to(device)
-    # optimizer = optim.Adam(net.parameters(), lr=learning_rate, betas=(0.9, 0.999), eps=1e-08)
-    optimizer = optim.SGD(net.parameters(), lr=learning_rate, momentum=0.9)
+    optimizer = optim.Adam(net.parameters(), lr=learning_rate, betas=(0.9, 0.999), eps=1e-08)
+    # optimizer = optim.SGD(net.parameters(), lr=learning_rate, momentum=0.9)
     # optimizer = optim.RMSprop(net.parameters(), lr=learning_rate)
 
-    scheduler = StepLR(optimizer, step_size=30, gamma=0.3)
+    scheduler = StepLR(optimizer, step_size=80, gamma=0.5)
 
 
     train_loss_all = []
@@ -164,7 +164,7 @@ if __name__ == '__main__':
                 # save the model
                 minloss = np.mean(np.array(valid_loss_epoch))
                 checkpoint_file = "%s/%s_%.4f.t7"%(PATH_PREFIX, modelname, minloss)
-                checkpoint_best_file = "%s/%s_sgd_best.t7"%(PATH_PREFIX, modelname)
+                checkpoint_best_file = "%s/%s_adam_best.t7"%(PATH_PREFIX, modelname)
                 # torch.save(net, checkpoint_file)
                 torch.save(net.module.state_dict(), checkpoint_best_file)
                 print('==> checkpoint model saving to %s and %s'%(checkpoint_file, checkpoint_best_file))

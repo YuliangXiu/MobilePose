@@ -23,7 +23,7 @@ Some codes for networks and display are brought from:
 ## Evaluation Results
 
 |Model(+DUC+DSNTNN)|Parmas(M)|Flops(G)|AP@0.5:0.95|AP@0.5|AR@0.5:0.95|AR@0.5|Link|
-|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 |ResNet18|12.26|1.64|**68.2**|93.9|**79.7**|96.7|[51.5M](https://drive.google.com/open?id=17Z1zetIVDI4_8-ZoFgTRsjHtDpwGtjRT)|
 |MobileNetV2|3.91|0.49|67.5|**94.9**|79.4|**97.1**|[16.6M](https://drive.google.com/open?id=15Ihv1bVQv6_tYTFlECJMNrXEmrrka5g4)|
 |ShuffleNetV2|2.92|**0.31**|61.5|91.6|74.8|95.5|[12.4M](https://drive.google.com/open?id=184Zg4E6HbbizPFYcELMXCd7mwWXdUd3U)|

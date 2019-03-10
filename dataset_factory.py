@@ -1,3 +1,16 @@
+'''
+File: dataset_factory.py
+Project: MobilePose-PyTorch
+File Created: Sunday, 10th March 2019 8:02:12 pm
+Author: Yuliang Xiu (yuliangxiu@sjtu.edu.cn)
+-----
+Last Modified: Monday, 11th March 2019 12:51:11 am
+Modified By: Yuliang Xiu (yuliangxiu@sjtu.edu.cn>)
+-----
+Copyright 2018 - 2019 Shanghai Jiao Tong University, Machine Vision and Intelligence Group
+'''
+
+
 from dataloader import Rescale, Wrap, PoseDataset, ToTensor, Augmentation, Expansion
 from torchvision import datasets, transforms, utils, models
 import os
@@ -12,14 +25,7 @@ def get_transform(modeltype, input_size):
     :param input_size:
     :return:
     """
-    # if "resnet" in modeltype:
-    #     return Rescale((input_size, input_size))
-    # elif "mobilenet" in modeltype:
-    #     return Wrap((input_size, input_size))
-    # else:
-    #     raise ValueError("modeltype is not wrong")
     return Rescale((input_size, input_size))
-    # return Wrap((input_size, input_size))
 
 
 class DatasetFactory:

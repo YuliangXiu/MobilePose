@@ -1,3 +1,16 @@
+'''
+File: joint_transforms.py
+Project: MobilePose-PyTorch
+File Created: Monday, 7th January 2019 1:25:58 pm
+Author: Yuliang Xiu (yuliangxiu@sjtu.edu.cn)
+-----
+Last Modified: Monday, 11th March 2019 12:51:40 am
+Modified By: Yuliang Xiu (yuliangxiu@sjtu.edu.cn>)
+-----
+Copyright 2018 - 2019 Shanghai Jiao Tong University, Machine Vision and Intelligence Group
+'''
+
+
 import math
 import numbers
 import random

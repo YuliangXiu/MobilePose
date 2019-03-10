@@ -1,14 +1,15 @@
 '''
 File: dataloader.py
-Project: MobilePose
-File Created: Thursday, 8th March 2018 3:00:27 pm
+Project: MobilePose-PyTorch
+File Created: Tuesday, 15th January 2019 6:26:25 pm
 Author: Yuliang Xiu (yuliangxiu@sjtu.edu.cn)
 -----
-Last Modified: Thursday, 8th March 2018 3:00:39 pm
+Last Modified: Monday, 11th March 2019 12:51:19 am
 Modified By: Yuliang Xiu (yuliangxiu@sjtu.edu.cn>)
 -----
-Copyright 2018 - 2018 Shanghai Jiao Tong University, Machine Vision and Intelligence Group
+Copyright 2018 - 2019 Shanghai Jiao Tong University, Machine Vision and Intelligence Group
 '''
+
 
 import csv
 import numpy as np
@@ -161,14 +162,6 @@ class ToTensor(object):
 		# todo: support heatmap
         # guass_heatmap = sample['guass_heatmap']
         h, w = image.shape[:2]
-
-        # x_mean = np.mean(image[:,:,3])
-        # x_std = np.std(image[:,:,3])
-        # y_mean = np.mean(image[:,:,4])
-        # y_std = np.std(image[:,:,4])
-
-        # mean=np.array([0.485, 0.456, 0.406, x_mean, y_mean])
-        # std=np.array([0.229, 0.224, 0.225, x_std, y_std])
 
         mean=np.array([0.485, 0.456, 0.406])
         std=np.array([0.229, 0.224, 0.225])

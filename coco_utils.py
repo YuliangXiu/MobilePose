@@ -1,14 +1,15 @@
 '''
 File: coco_utils.py
-Project: MobilePose
-File Created: Saturday, 3rd March 2018 7:04:57 pm
+Project: MobilePose-PyTorch
+File Created: Thursday, 20th December 2018 6:11:07 pm
 Author: Yuliang Xiu (yuliangxiu@sjtu.edu.cn)
 -----
-Last Modified: Thursday, 8th March 2018 3:02:15 pm
+Last Modified: Monday, 11th March 2019 12:51:27 am
 Modified By: Yuliang Xiu (yuliangxiu@sjtu.edu.cn>)
 -----
-Copyright 2018 - 2018 Shanghai Jiao Tong University, Machine Vision and Intelligence Group
+Copyright 2018 - 2019 Shanghai Jiao Tong University, Machine Vision and Intelligence Group
 '''
+
 
 
 # define coco class

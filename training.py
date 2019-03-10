@@ -1,16 +1,16 @@
 # coding: utf-8
-
 '''
 File: training.py
-Project: MobilePose
-File Created: Thursday, 8th March 2018 2:50:11 pm
+Project: MobilePose-PyTorch
+File Created: Friday, 8th March 2019 6:53:13 pm
 Author: Yuliang Xiu (yuliangxiu@sjtu.edu.cn)
 -----
-Last Modified: Thursday, 8th March 2018 2:50:51 pm
+Last Modified: Monday, 11th March 2019 12:50:27 am
 Modified By: Yuliang Xiu (yuliangxiu@sjtu.edu.cn>)
 -----
-Copyright 2018 - 2018 Shanghai Jiao Tong University, Machine Vision and Intelligence Group
+Copyright 2018 - 2019 Shanghai Jiao Tong University, Machine Vision and Intelligence Group
 '''
+
 
 # remove warning
 import warnings

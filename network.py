@@ -1,14 +1,15 @@
 '''
-File: networks.py
-Project: MobilePose
-File Created: Thursday, 8th March 2018 2:59:28 pm
+File: network.py
+Project: MobilePose-PyTorch
+File Created: Thursday, 7th March 2019 6:33:57 pm
 Author: Yuliang Xiu (yuliangxiu@sjtu.edu.cn)
 -----
-Last Modified: Thursday, 8th March 2018 3:01:29 pm
+Last Modified: Monday, 11th March 2019 12:50:40 am
 Modified By: Yuliang Xiu (yuliangxiu@sjtu.edu.cn>)
 -----
-Copyright 2018 - 2018 Shanghai Jiao Tong University, Machine Vision and Intelligence Group
+Copyright 2018 - 2019 Shanghai Jiao Tong University, Machine Vision and Intelligence Group
 '''
+
 
 
 from networks import *

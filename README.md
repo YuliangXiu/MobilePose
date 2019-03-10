@@ -7,22 +7,27 @@ Some codes for networks and display are brought from:
 2. [Vanilla FCN, U-Net, SegNet, PSPNet, GCN, DUC](https://github.com/zijundeng/pytorch-semantic-segmentation)
 3. [Shufflenet-v2-Pytorch](https://github.com/ericsun99/Shufflenet-v2-Pytorch)
 4. [tf-pose-estimation](https://github.com/ildoonet/tf-pose-estimation) 
-5. [DSNTNN](https://github.com/anibali/dsntnn)
+5. [dsntnn](https://github.com/anibali/dsntnn)
+
+## NEWS!
+
+- Mar 2019: Support running on MacBook with decent FPS!  
+- Feb 2019: **ALL** the pretrained model files are avaliable!
 
 ## Requirements
 
-- Python 3.6
+- Python 3.7
 - PyTorch 1.0
-- DSNTNN 1.0
+- [dsntnn 1.0](https://github.com/anibali/dsntnn)
 
 ## Evaluation Results
 
-|Model|Parmas(M)|Flops(G)|mAP(IoU=0.5:0.95)|mAP(IoU=0.5)|mAR(IoU=0.5:0.95)|mAR(IoU=0.5)|Google Drive|
-|---|---|---|---|---|---|---|---|
-|ResNet18(224x224)+DUC+DSNTNN|12.26|1.64|**0.682**|0.939|**0.797**|0.967|[50M](https://drive.google.com/open?id=17Z1zetIVDI4_8-ZoFgTRsjHtDpwGtjRT)|
-|MobileNetV2(224x224)+DUC+DSNTNN|3.91|0.49|0.675|**0.949**|0.794|**0.971**|[16M]([https://drive.google.com/open?id=1Meyz8Jg2aRe8ijeBAY1uCRpV9l5OJoXl](https://drive.google.com/open?id=15Ihv1bVQv6_tYTFlECJMNrXEmrrka5g4))|
-|ShuffleNetV2(224x224)+DUC+DSNTNN|2.92|**0.31**|0.615|0.916|0.748|0.955|[12M](https://drive.google.com/open?id=184Zg4E6HbbizPFYcELMXCd7mwWXdUd3U)|
-|SqueezeNet1.1(224x224)+DUC+DSNTNN|**2.22**|0.63|0.584|0.921|0.723|0.958|[9M](https://drive.google.com/open?id=1RePeiBJHeHvmYTQ5vAUJHC5CstHIBcP0)|
+|Model(+DUC+DSNTNN)|Parmas(M)|Flops(G)|AP@0.5:0.95|AP@0.5|AR@0.5:0.95|AR@0.5|Link|
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+|ResNet18|12.26|1.64|**68.2**|93.9|**79.7**|96.7|[51.5M](https://drive.google.com/open?id=17Z1zetIVDI4_8-ZoFgTRsjHtDpwGtjRT)|
+|MobileNetV2|3.91|0.49|67.5|**94.9**|79.4|**97.1**|[16.6M](https://drive.google.com/open?id=15Ihv1bVQv6_tYTFlECJMNrXEmrrka5g4)|
+|ShuffleNetV2|2.92|**0.31**|61.5|91.6|74.8|95.5|[12.4M](https://drive.google.com/open?id=184Zg4E6HbbizPFYcELMXCd7mwWXdUd3U)|
+|SqueezeNet1.1|**2.22**|0.63|58.4|92.1|72.3|95.8|[9.3M](https://drive.google.com/open?id=1RePeiBJHeHvmYTQ5vAUJHC5CstHIBcP0)|
 
 <div align="center">
     <img src="./demo.png">
@@ -39,19 +44,23 @@ Some codes for networks and display are brought from:
 
 ## Usage
 
-1. Training:
+1. Installation:
+
+```shell
+pip install -r requirements.txt
+```
+2. Training:
 ```shell
 python training.py --model shufflenetv2 --gpu 0 --inputsize 224 --lr 1e-3 --batchsize 128 --t7 ./models/shufflenetv2_224_adam_best.t7
 ```
-2. Evaluation
+3. Evaluation
 ```shell
 ln -s cocoapi/PythonAPI/pycocotools
 cd cocoapi/PythonAPI && make
 
 python eval.py --t7 ./models/resnet18_224_adam_best.t7 --model resnet18 --gpu 0
 ```
-
-3. Web Camera Demo
+4. Web Camera Demo (MacBook)
 
 ```shell
 python run_webcam.py --model squeezenet --inp_dim 224 --camera 0

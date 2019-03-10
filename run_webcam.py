@@ -1,13 +1,13 @@
 '''
 File: run_webcam.py
-Project: MobilePose
-File Created: Thursday, 8th March 2018 2:19:39 pm
+Project: MobilePose-PyTorch
+File Created: Monday, 11th March 2019 12:47:30 am
 Author: Yuliang Xiu (yuliangxiu@sjtu.edu.cn)
 -----
-Last Modified: Thursday, 8th March 2018 3:01:35 pm
+Last Modified: Monday, 11th March 2019 12:48:49 am
 Modified By: Yuliang Xiu (yuliangxiu@sjtu.edu.cn>)
 -----
-Copyright 2018 - 2018 Shanghai Jiao Tong University, Machine Vision and Intelligence Group
+Copyright 2018 - 2019 Shanghai Jiao Tong University, Machine Vision and Intelligence Group
 '''
 
 import argparse
@@ -48,7 +48,7 @@ if __name__ == '__main__':
     # initial the camera
     cam = cv2.VideoCapture(args.camera)
 
-    # ret_val, image = cam.read()
+    ret_val, image = cam.read()
     image = crop_camera(image)
 
     while True:

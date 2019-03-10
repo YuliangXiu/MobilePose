@@ -1,14 +1,15 @@
 '''
 File: estimator.py
-Project: MobilePose
-File Created: Thursday, 8th March 2018 3:02:01 pm
+Project: MobilePose-PyTorch
+File Created: Monday, 11th March 2019 12:50:16 am
 Author: Yuliang Xiu (yuliangxiu@sjtu.edu.cn)
 -----
-Last Modified: Thursday, 8th March 2018 3:02:06 pm
+Last Modified: Monday, 11th March 2019 12:50:58 am
 Modified By: Yuliang Xiu (yuliangxiu@sjtu.edu.cn>)
 -----
-Copyright 2018 - 2018 Shanghai Jiao Tong University, Machine Vision and Intelligence Group
+Copyright 2018 - 2019 Shanghai Jiao Tong University, Machine Vision and Intelligence Group
 '''
+
 
 import itertools
 import logging

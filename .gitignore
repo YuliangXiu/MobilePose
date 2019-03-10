@@ -2,16 +2,13 @@
 */.ipynb_checkpoints/*
 *.t7
 *.jpg
-*.png
 *.txt
 !requirements.txt
 *.pyc
-models
 results
 __pycache__
 others
 .vscode
-.pycocotools
 .idea
 pretrained
 *.pth

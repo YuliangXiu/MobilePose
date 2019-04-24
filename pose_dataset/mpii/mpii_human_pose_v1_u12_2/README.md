@@ -38,10 +38,10 @@ set annotations.
 ```
 
 ### Download
-
+   https://datasets.d2.mpi-inf.mpg.de/andriluka14cvpr/mpii_human_pose_v1.tar.gz
 -. **Images (12.9 GB)**
    
-   http://datasets.d2.mpi-inf.mpg.de/andriluka14cvpr/mpii_human_pose_v1.tar.gz
+   https://datasets.d2.mpi-inf.mpg.de/andriluka14cvpr/mpii_human_pose_v1_u12_2.zip
 -. **Annotations (12.5 MB)**	
    
    http://datasets.d2.mpi-inf.mpg.de/andriluka14cvpr/mpii_human_pose_v1_u12.tar.gz

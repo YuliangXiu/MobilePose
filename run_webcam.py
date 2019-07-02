@@ -34,7 +34,7 @@ import matplotlib.pyplot as plt
 if __name__ == '__main__':
     
     parser = argparse.ArgumentParser(description='MobilePose Realtime Webcam.')
-    parser.add_argument('--model', type=str, default='resnet18', help='mobilenetv2|resnet18|shufflenetv2|squeezenet')
+    parser.add_argument('--model', type=str, default='resnet18', choices=['mobilenetv2', 'resnet18', 'shufflenetv2', 'squeezenet'])
     parser.add_argument('--inp_dim', type=int, default=224, help='input size')
     parser.add_argument('--camera', type=int, default=0)
 

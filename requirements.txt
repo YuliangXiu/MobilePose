@@ -12,4 +12,4 @@ imgaug==0.2.7
 matplotlib==3.0.2
 Pillow==5.4.1
 scripts==2.0
-skimage==0.0
+skimage

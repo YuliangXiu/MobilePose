@@ -29,6 +29,34 @@ class ResEstimator:
         self.net = net
         self.net.load_state_dict(torch.load(model_path, map_location=lambda storage, loc: storage))
         self.net.eval()
+
+    def addlayer(self, image):
+        h, w = image.shape[:2]
+        x = np.arange(0, w)
+        y = np.arange(0, h) 
+        x, y = np.meshgrid(x, y)
+        x = x[:,:, np.newaxis]
+        y = y[:,:, np.newaxis]
+        image = np.concatenate((image, x, y), axis=2)
+        
+        return image
+
+    def wrap(self, image, output_size):
+        image_ = image/256.0
+        h, w = image_.shape[:2]
+        if isinstance(output_size, int):
+            if h > w:
+                new_h, new_w = output_size * h / w, output_size
+            else:
+                new_h, new_w = output_size, output_size * w / h
+        else:
+            new_h, new_w = output_size
+
+        new_h, new_w = int(new_h), int(new_w)
+
+        image = transform.resize(image_, (new_w, new_h))
+        pose_fun = lambda x: (x.reshape([-1,2]) * 1.0 /np.array([new_w, new_h])*np.array([w,h]))
+        return {'image': image, 'pose_fun': pose_fun}
         
     def rescale(self, image, output_size):
 

@@ -32,8 +32,9 @@ class ResEstimator:
 
     def addlayer(self, image):
         h, w = image.shape[:2]
-        x = np.arange(0, w)
-        y = np.arange(0, h) 
+        # todo retraining model
+        x = np.arange(0, h)
+        y = np.arange(0, w) 
         x, y = np.meshgrid(x, y)
         x = x[:,:, np.newaxis]
         y = y[:,:, np.newaxis]

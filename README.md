@@ -11,6 +11,7 @@ Some codes for networks and display are brought from:
 
 ## NEWS!
 
+- Apr 2021: [Siyuan Pan](https://github.com/pansiyuan123) provides [MNN version](https://market.mnn.zone/s/#/modelmarket/detail/107)!
 - Mar 2019: Support running on MacBook with decent FPS!  
 - Feb 2019: **ALL** the pretrained model files are avaliable!
 
@@ -68,7 +69,7 @@ python run_webcam.py --model squeezenet --inp_dim 224 --camera 0
 
 ## Contributors
 
-MobilePose is developed and maintained by [Yuliang Xiu](http://xiuyuliang.cn/about/), [Zexin Chen](https://github.com/ZexinChen) and [Yinghong Fang](https://github.com/Fangyh09).
+MobilePose is developed and maintained by [Yuliang Xiu](http://xiuyuliang.cn/about/), [Zexin Chen](https://github.com/ZexinChen) and [Yinghong Fang](https://github.com/Fangyh09). Thanks for [Siyuan Pan](https://github.com/pansiyuan123)'s implementation of [mnn version](https://market.mnn.zone/s/#/modelmarket/detail/107).
 
 ## License
 

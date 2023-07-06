@@ -1,5 +1,5 @@
 alog==0.9.13
-torch==1.0.0
+torch==1.13.1
 scipy==1.10.0
 scikit_image==0.13.1
 opencv_python==3.4.2.17
